@@ -276,42 +276,109 @@ class Lexer:
     
     def __init__(self, source: str):
         self.source = source
-        self.state = State.START
         self.position = 0
+        self.line = 1
+        self.column = 1
 
-    
+    def classify(self, char: str) -> CharClass | None:
+        if char.isalpha() or char == '_': return CharClass.LETTER
+        if char.isdigit(): return CharClass.DIGIT
+        return CHAR_CLASS.get(char, None)
+
+    def get_next_state(self, current_state: State, char_class: CharClass | None) -> State:
+        if char_class is None: return State.ERROR
+        return self.delta.get(current_state, {}).get(char_class, State.ERROR)
+
+    def advance(self) -> None:
+        if self.position < len(self.source):
+            if self.source[self.position] == "\n":
+                self.line += 1
+                self.column = 1
+            else:
+                self.column += 1
+            self.position += 1
+
+    def rollback_to(self, target_position: int, target_line: int, target_column: int) -> None:
+        self.position = target_position
+        self.line = target_line
+        self.column = target_column
+
+    def skip_whitespace_and_comments(self) -> bool:
+        skipped = False
+        while self.position < len(self.source):
+            ch = self.source[self.position]
+
+            if ch in (" ", "\t", "\r", "\n"):
+                self.advance()
+                skipped = True
+                continue
+
+            if ch == "/" and self.position + 1 < len(self.source) and self.source[self.position + 1] == "/":
+                while self.position < len(self.source) and self.source[self.position] != "\n":
+                    self.advance()
+                skipped = True
+                continue
+
+            if ch == "/" and self.position + 1 < len(self.source) and self.source[self.position + 1] == "*":
+                self.advance()
+                self.advance()
+                closed = False
+                while self.position < len(self.source):
+                    if (
+                        self.source[self.position] == "*"
+                        and self.position + 1 < len(self.source)
+                        and self.source[self.position + 1] == "/"
+                    ):
+                        self.advance()
+                        self.advance()
+                        closed = True
+                        break
+                    self.advance()
+                if not closed:
+                    raise LexerError("Comment not terminated", self.line, self.column)
+                skipped = True
+                continue
+
+            break
+        return skipped
 
     def tokens(self) -> Iterator[Token]:
         """Produza todos os tokens significativos e um único EOF ao final."""
         while self.position < len(self.source):
-            # if whitespace or comment skip
-            # ?
+            if self.skip_whitespace_and_comments(): continue
+            if self.position >= len(self.source): break
 
             start_position = self.position
             start_line = self.line
             start_column = self.column
-
             state = State.START
             last_final = None
 
             while self.position < len(self.source):
                 char = self.source[self.position]
                 char_class = self.classify(char)
-                next_state = self.get_next_state(self.state, char_class)
+                next_state = self.get_next_state(state, char_class)
 
                 if next_state == State.ERROR:
                     break
 
                 self.state = next_state
-                self.position += 1
+                self.advance()
 
                 if self.state in self.final_states:
                     last_final = (state, self.position, self.line, self.column)
 
             if last_final is not None:
-                # volta para o ultimo estado de aceitação
-                rollback_to(last_final.input_position)
-                return TokenKind[last_final.state]
+                final_state, end_position, end_line, end_column = last_final
+                self.rollback_to(end_position, end_line, end_column)
+                lexeme = self.source[start_position:end_position]
+
+                '''TODO PRECISA RETORNAR O TOKEN CORRETO COM BASE NO final_state E lexeme
+                    algo como Token(estado, lexeme, value, line, column)
+                    provavel que a gente precise criar um metodo pra determinar o token
+                    com base no estado final, no lexeme e no value
+                ''' 
+                
             else:
                 raise LexerError(f"caractere inesperado: {self.source[self.position]!r}", self.line, self.column)
             
@@ -319,8 +386,3 @@ class Lexer:
 
     def scan(self) -> list[Token]:
         return list(self.tokens())
-
-    def classify(char: str) -> CharClass:
-        if char.isalpha(): return CharClass.LETTER
-        if char.isdigit(): return CharClass.DIGIT
-        return CHAR_CLASS[char]
