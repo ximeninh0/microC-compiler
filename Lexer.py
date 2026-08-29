@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Iterator
 
 
+
 class TokenKind(enum.Enum):
     """Classe já implementada: nomes e números não devem ser alterados."""
 
@@ -46,7 +47,7 @@ class TokenKind(enum.Enum):
     LEFT_BRACE = 42
     RIGHT_BRACE = 43
     COMMA = 44
-    SEMICOLON = 45
+    SCOLON = 45
 
 
 @dataclass(frozen=True)
@@ -100,12 +101,65 @@ class State(enum.Enum):
     IN_MINUS = 19
     IN_STAR = 20
     IN_PERCENT = 21
-    IN_LEFT_PAREN = 22
-    IN_RIGHT_PAREN = 23
-    IN_LEFT_BRACE = 24
-    IN_RIGHT_BRACE = 25
+    IN_OPN_PAREN = 22
+    IN_CLS_PAREN = 23
+    IN_OPN_BRACE = 24
+    IN_CLS_BRACE = 25
     IN_COMMA = 26
-    IN_SEMICOLON = 27
+    IN_SCOLON = 27
+
+    ELSE_1 = 28
+    ELSE_2 = 29
+    ELSE_3 = 30
+    ELSE_4 = 31
+
+    RETURN_1 = 32
+    RETURN_2 = 33
+    RETURN_3 = 34
+    RETURN_4 = 35
+    RETURN_5 = 36
+
+    WHILE_1 = 37
+    WHILE_2 = 38
+    WHILE_3 = 39
+    WHILE_4 = 40
+    WHILE_5 = 41
+
+    PRINT_1 = 42
+    PRINT_2 = 43
+    PRINT_3 = 44
+    PRINT_4 = 45
+    PRINT_5 = 46
+
+    FALSE_1 = 47
+    FALSE_2 = 48
+    FALSE_3 = 49
+    FALSE_4 = 50
+    FALSE_5 = 51
+
+    TRUE_1 = 52
+    TRUE_2 = 53
+    TRUE_3 = 54
+    TRUE_4 = 55
+
+    VOID_1 = 56
+    VOID_2 = 57
+    VOID_3 = 58
+    VOID_4 = 59
+
+    BOOL_1 = 60
+    BOOL_2 = 61
+    BOOL_3 = 62
+    BOOL_4 = 63
+
+    IN_I = 64
+    IF_2 = 65
+
+    INT_1 = 66
+    INT_2 = 67
+    INT_3 = 68
+
+    SE = 69
 
     ERROR = -1
     
@@ -124,14 +178,37 @@ class CharClass(enum.Enum):
     STAR = 9
     SLASH = 10
     QUOTE = 11
-    OPEN_PAREN = 12
-    OPEN_BRACE = 13
-    CLOSE_PAREN = 14
-    CLOSE_BRACE = 15
+    OPN_PAREN = 12
+    OPN_BRACE = 13
+    CLS_PAREN = 14
+    CLS_BRACE = 15
     INV_SLASH = 16
     AMPERSAND = 17
     PIPE = 18
     PERCENT = 19
+    LETTER_I = 20
+    LETTER_F = 21
+    LETTER_W = 22
+    LETTER_H = 23
+    LETTER_L = 24
+    LETTER_E = 25
+    LETTER_R = 26
+    LETTER_T = 27
+    LETTER_U = 28
+    LETTER_N = 29
+    LETTER_V = 30
+    LETTER_O = 31
+    LETTER_D = 32
+    LETTER_A = 33
+    LETTER_S = 34
+    LETTER_B = 35
+    LETTER_P = 36
+    PERCENT = 37
+    SPACE = 38
+
+    SCOLON = 39
+    COMMA = 40
+    # LETTER_E = 20
 
 CHAR_CLASS = {
     "=": CharClass.EQUAL,
@@ -144,16 +221,33 @@ CHAR_CLASS = {
     "/": CharClass.SLASH,
     "%": CharClass.PERCENT,
     '"': CharClass.QUOTE,
-    "(": CharClass.OPEN_PAREN,
-    "{": CharClass.OPEN_BRACE,
-    ")": CharClass.CLOSE_PAREN,
-    "}": CharClass.CLOSE_BRACE,
+    "(": CharClass.OPN_PAREN,
+    "{": CharClass.OPN_BRACE,
+    ")": CharClass.CLS_PAREN,
+    "}": CharClass.CLS_BRACE,
     " ": CharClass.SPACE,
     "\\":CharClass.INV_SLASH,
     "&": CharClass.AMPERSAND,
     "|": CharClass.PIPE,
     ",": CharClass.COMMA,
-    ";": CharClass.SEMICOLON
+    ";": CharClass.SCOLON,
+    "i": CharClass.LETTER_I,
+    "e": CharClass.LETTER_E,
+    "f": CharClass.LETTER_F,
+    "w": CharClass.LETTER_W,
+    "h": CharClass.LETTER_H,
+    "l": CharClass.LETTER_L,
+    "r": CharClass.LETTER_R,
+    "t": CharClass.LETTER_T,
+    "u": CharClass.LETTER_U,
+    "n": CharClass.LETTER_N,
+    "v": CharClass.LETTER_V,
+    "o": CharClass.LETTER_O,
+    "d": CharClass.LETTER_D,
+    "a": CharClass.LETTER_A,
+    "s": CharClass.LETTER_S,
+    "b": CharClass.LETTER_B,
+    "p": CharClass.LETTER_P
 }
 
 KEYWORDS: dict[str, TokenKind] = {
@@ -177,6 +271,23 @@ class Lexer:
 
     delta: dict[State, dict[CharClass, State]] = {
         State.START: {
+            CharClass.LETTER_I: State.IN_I,
+            CharClass.LETTER_E: State.ELSE_1,
+            CharClass.LETTER_F: State.FALSE_1,
+            CharClass.LETTER_W: State.WHILE_1,
+            CharClass.LETTER_H: State.IN_IDENTIFIER,
+            CharClass.LETTER_L: State.IN_IDENTIFIER,
+            CharClass.LETTER_R: State.RETURN_1,
+            CharClass.LETTER_T: State.TRUE_1,
+            CharClass.LETTER_U: State.IN_IDENTIFIER,
+            CharClass.LETTER_N: State.IN_IDENTIFIER,
+            CharClass.LETTER_V: State.VOID_1,
+            CharClass.LETTER_O: State.IN_IDENTIFIER,
+            CharClass.LETTER_D: State.IN_IDENTIFIER,
+            CharClass.LETTER_A: State.IN_IDENTIFIER,
+            CharClass.LETTER_S: State.IN_IDENTIFIER,
+            CharClass.LETTER_B: State.BOOL_1,
+            CharClass.LETTER_P: State.PRINT_1,
             CharClass.LETTER: State.IN_IDENTIFIER,
             CharClass.DIGIT: State.IN_INT,
             CharClass.QUOTE: State.IN_STRING,
@@ -190,73 +301,541 @@ class Lexer:
             CharClass.MINUS: State.IN_MINUS,
             CharClass.STAR: State.IN_STAR,
             CharClass.PERCENT: State.IN_PERCENT,
-            CharClass.OPEN_PAREN: State.IN_LEFT_PAREN,
-            CharClass.CLOSE_PAREN: State.IN_RIGHT_PAREN,
-            CharClass.OPEN_BRACE: State.IN_LEFT_BRACE,
-            CharClass.CLOSE_BRACE: State.IN_RIGHT_BRACE,
+            CharClass.OPN_PAREN: State.IN_OPN_PAREN,
+            CharClass.CLS_PAREN: State.IN_CLS_PAREN,
+            CharClass.OPN_BRACE: State.IN_OPN_BRACE,
+            CharClass.CLS_BRACE: State.IN_CLS_BRACE,
             CharClass.COMMA: State.IN_COMMA,
-            CharClass.SEMICOLON: State.IN_SEMICOLON
+            CharClass.SCOLON: State.IN_SCOLON,
+            CharClass.SPACE: State.START,
         },
 
         # Identificadores e Inteiros (loops de continuação)
         State.IN_IDENTIFIER: {
+            CharClass.LETTER_I: State.IN_IDENTIFIER,
+            CharClass.LETTER_E: State.IN_IDENTIFIER,
+            CharClass.LETTER_F: State.IN_IDENTIFIER,
+            CharClass.LETTER_W: State.IN_IDENTIFIER,
+            CharClass.LETTER_H: State.IN_IDENTIFIER,
+            CharClass.LETTER_L: State.IN_IDENTIFIER,
+            CharClass.LETTER_R: State.IN_IDENTIFIER,
+            CharClass.LETTER_T: State.IN_IDENTIFIER,
+            CharClass.LETTER_U: State.IN_IDENTIFIER,
+            CharClass.LETTER_N: State.IN_IDENTIFIER,
+            CharClass.LETTER_V: State.IN_IDENTIFIER,
+            CharClass.LETTER_O: State.IN_IDENTIFIER,
+            CharClass.LETTER_D: State.IN_IDENTIFIER,
+            CharClass.LETTER_A: State.IN_IDENTIFIER,
+            CharClass.LETTER_S: State.IN_IDENTIFIER,
+            CharClass.LETTER_B: State.IN_IDENTIFIER,
+            CharClass.LETTER_P: State.IN_IDENTIFIER,
             CharClass.LETTER: State.IN_IDENTIFIER,
-            CharClass.DIGIT: State.IN_IDENTIFIER
+            CharClass.DIGIT: State.IN_IDENTIFIER,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,
         },
+
+        State.ELSE_1: {
+            CharClass.LETTER_I: State.IN_IDENTIFIER,
+            CharClass.LETTER_E: State.IN_IDENTIFIER,
+            CharClass.LETTER_F: State.IN_IDENTIFIER,
+            CharClass.LETTER_W: State.IN_IDENTIFIER,
+            CharClass.LETTER_H: State.IN_IDENTIFIER,
+            CharClass.LETTER_L: State.ELSE_2,
+            CharClass.LETTER_R: State.IN_IDENTIFIER,
+            CharClass.LETTER_T: State.IN_IDENTIFIER,
+            CharClass.LETTER_U: State.IN_IDENTIFIER,
+            CharClass.LETTER_N: State.IN_IDENTIFIER,
+            CharClass.LETTER_V: State.IN_IDENTIFIER,
+            CharClass.LETTER_O: State.IN_IDENTIFIER,
+            CharClass.LETTER_D: State.IN_IDENTIFIER,
+            CharClass.LETTER_A: State.IN_IDENTIFIER,
+            CharClass.LETTER_S: State.IN_IDENTIFIER,
+            CharClass.LETTER_B: State.IN_IDENTIFIER,
+            CharClass.LETTER_P: State.IN_IDENTIFIER,
+            CharClass.LETTER: State.IN_IDENTIFIER,
+            CharClass.DIGIT: State.IN_IDENTIFIER,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,   
+        },
+
+        State.ELSE_2: {
+            CharClass.LETTER_I: State.IN_IDENTIFIER,
+            CharClass.LETTER_E: State.IN_IDENTIFIER,
+            CharClass.LETTER_F: State.IN_IDENTIFIER,
+            CharClass.LETTER_W: State.IN_IDENTIFIER,
+            CharClass.LETTER_H: State.IN_IDENTIFIER,
+            CharClass.LETTER_L: State.IN_IDENTIFIER,
+            CharClass.LETTER_R: State.IN_IDENTIFIER,
+            CharClass.LETTER_T: State.IN_IDENTIFIER,
+            CharClass.LETTER_U: State.IN_IDENTIFIER,
+            CharClass.LETTER_N: State.IN_IDENTIFIER,
+            CharClass.LETTER_V: State.IN_IDENTIFIER,
+            CharClass.LETTER_O: State.IN_IDENTIFIER,
+            CharClass.LETTER_D: State.IN_IDENTIFIER,
+            CharClass.LETTER_A: State.IN_IDENTIFIER,
+            CharClass.LETTER_S: State.IN_ELSE_3,
+            CharClass.LETTER_B: State.IN_IDENTIFIER,
+            CharClass.LETTER_P: State.IN_IDENTIFIER,
+            CharClass.LETTER: State.IN_IDENTIFIER,
+            CharClass.DIGIT: State.IN_IDENTIFIER,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,  
+        },
+
+        State.ELSE_3: {
+            CharClass.LETTER_I: State.IN_IDENTIFIER,
+            CharClass.LETTER_E: State.ELSE_4,
+            CharClass.LETTER_F: State.IN_IDENTIFIER,
+            CharClass.LETTER_W: State.IN_IDENTIFIER,
+            CharClass.LETTER_H: State.IN_IDENTIFIER,
+            CharClass.LETTER_L: State.IN_IDENTIFIER,
+            CharClass.LETTER_R: State.IN_IDENTIFIER,
+            CharClass.LETTER_T: State.IN_IDENTIFIER,
+            CharClass.LETTER_U: State.IN_IDENTIFIER,
+            CharClass.LETTER_N: State.IN_IDENTIFIER,
+            CharClass.LETTER_V: State.IN_IDENTIFIER,
+            CharClass.LETTER_O: State.IN_IDENTIFIER,
+            CharClass.LETTER_D: State.IN_IDENTIFIER,
+            CharClass.LETTER_A: State.IN_IDENTIFIER,
+            CharClass.LETTER_S: State.IN_IDENTIFIER,
+            CharClass.LETTER_B: State.IN_IDENTIFIER,
+            CharClass.LETTER_P: State.IN_IDENTIFIER,
+            CharClass.LETTER: State.IN_IDENTIFIER,
+            CharClass.DIGIT: State.IN_IDENTIFIER,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,  
+        },
+
+        State.ELSE_4: {
+            CharClass.LETTER_I: State.IN_IDENTIFIER,
+            CharClass.LETTER_E: State.IN_IDENTIFIER,
+            CharClass.LETTER_F: State.IN_IDENTIFIER,
+            CharClass.LETTER_W: State.IN_IDENTIFIER,
+            CharClass.LETTER_H: State.IN_IDENTIFIER,
+            CharClass.LETTER_L: State.IN_IDENTIFIER,
+            CharClass.LETTER_R: State.IN_IDENTIFIER,
+            CharClass.LETTER_T: State.IN_IDENTIFIER,
+            CharClass.LETTER_U: State.IN_IDENTIFIER,
+            CharClass.LETTER_N: State.IN_IDENTIFIER,
+            CharClass.LETTER_V: State.IN_IDENTIFIER,
+            CharClass.LETTER_O: State.IN_IDENTIFIER,
+            CharClass.LETTER_D: State.IN_IDENTIFIER,
+            CharClass.LETTER_A: State.IN_IDENTIFIER,
+            CharClass.LETTER_S: State.IN_IDENTIFIER,
+            CharClass.LETTER_B: State.IN_IDENTIFIER,
+            CharClass.LETTER_P: State.IN_IDENTIFIER,
+            CharClass.LETTER: State.IN_IDENTIFIER,
+            CharClass.DIGIT: State.IN_IDENTIFIER,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,  
+        },
+
         State.IN_INT: {
-            CharClass.DIGIT: State.IN_INT
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.IN_INT,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,        
         },
 
         # Strings e Escapes
         State.IN_STRING: {
+            CharClass.LETTER_I: State.IN_STRING,
+            CharClass.LETTER_E: State.IN_STRING,
+            CharClass.LETTER_F: State.IN_STRING,
+            CharClass.LETTER_W: State.IN_STRING,
+            CharClass.LETTER_H: State.IN_STRING,
+            CharClass.LETTER_L: State.IN_STRING,
+            CharClass.LETTER_R: State.IN_STRING,
+            CharClass.LETTER_T: State.IN_STRING,
+            CharClass.LETTER_U: State.IN_STRING,
+            CharClass.LETTER_N: State.IN_STRING,
+            CharClass.LETTER_V: State.IN_STRING,
+            CharClass.LETTER_O: State.IN_STRING,
+            CharClass.LETTER_D: State.IN_STRING,
+            CharClass.LETTER_A: State.IN_STRING,
+            CharClass.LETTER_S: State.IN_STRING,
+            CharClass.LETTER_B: State.IN_STRING,
+            CharClass.LETTER_P: State.IN_STRING,
             CharClass.LETTER: State.IN_STRING,
             CharClass.DIGIT: State.IN_STRING,
+            CharClass.QUOTE: State.SE,
             CharClass.EQUAL: State.IN_STRING,
+            CharClass.NOT: State.IN_STRING,
             CharClass.LESS: State.IN_STRING,
             CharClass.GREATER: State.IN_STRING,
-            CharClass.NOT: State.IN_STRING,
-            CharClass.SPACE: State.IN_STRING,
+            CharClass.AMPERSAND: State.IN_STRING,
+            CharClass.PIPE: State.IN_STRING,
             CharClass.PLUS: State.IN_STRING,
             CharClass.MINUS: State.IN_STRING,
             CharClass.STAR: State.IN_STRING,
-            CharClass.SLASH: State.IN_STRING,
             CharClass.PERCENT: State.IN_STRING,
-            CharClass.OPEN_PAREN: State.IN_STRING,
-            CharClass.CLOSE_PAREN: State.IN_STRING,
-            CharClass.OPEN_BRACE: State.IN_STRING,
-            CharClass.CLOSE_BRACE: State.IN_STRING,
-            CharClass.AMPERSAND: State.IN_STRING,
-            CharClass.PIPE: State.IN_STRING,
+            CharClass.OPN_PAREN: State.IN_STRING,
+            CharClass.CLS_PAREN: State.IN_STRING,
+            CharClass.OPN_BRACE: State.IN_STRING,
+            CharClass.CLS_BRACE: State.IN_STRING,
             CharClass.COMMA: State.IN_STRING,
-            CharClass.SEMICOLON: State.IN_STRING,
-            CharClass.INV_SLASH: State.IN_STRING_ESCAPE,  # Transita ao ler \
-            CharClass.QUOTE: State.IN_STRING_END        # Transita ao ler o " final
+            CharClass.SCOLON: State.IN_STRING,
+            CharClass.SPACE: State.IN_STRING,
         },
-        State.IN_STRING_ESCAPE: {
-            # Qualquer caractere de escape válido devolve o estado para IN_STRING
-            CharClass.LETTER: State.IN_STRING,
-            CharClass.INV_SLASH: State.IN_STRING,
-            CharClass.QUOTE: State.IN_STRING
-        },
+        # State.IN_STRING_ESCAPE: {
+        #     # Qualquer caractere de escape válido devolve o estado para IN_STRING
+        #     CharClass.LETTER: State.IN_STRING,
+        #     CharClass.INV_SLASH: State.IN_STRING,
+        #     CharClass.QUOTE: State.IN_STRING
+        # },
 
         # Operadores simples que viram compostos se encontrarem o segundo caractere
         State.IN_ASSIGN: {
-            CharClass.EQUAL: State.IN_EQUAL_EQUAL       # = seguido de = vira ==
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.SE,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.IN_EQUAL_EQUAL,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,        
         },
+
         State.IN_EXCLAMATION: {
-            CharClass.EQUAL: State.IN_NOT_EQUAL         # ! seguido de = vira !=
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.SE,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.IN_NOT_EQUAL,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,    
         },
         State.IN_LESS: {
-            CharClass.EQUAL: State.IN_LESS_EQUAL        # < seguido de = vira <=
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.SE,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.IN_LESS_EQUAL,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,    
         },
         State.IN_GREATER: {
-            CharClass.EQUAL: State.IN_GREATER_EQUAL     # > seguido de = vira >=
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.SE,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.IN_GREATER_EQUAL,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,    
         },
+
+        # TODO: Deveria cair em estado de erro ? (erro léxico) (discutir)
         State.IN_AMPERSAND: {
-            CharClass.AMPERSAND: State.IN_LOGICAL_AND   # & seguido de & vira &&
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.SE,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.IN_LOGICAL_AND,
+            CharClass.PIPE: State.SE,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,            
         },
+
         State.IN_PIPE: {
-            CharClass.PIPE: State.IN_LOGICAL_OR         # | seguido de | vira ||
+            CharClass.LETTER_I: State.SE,
+            CharClass.LETTER_E: State.SE,
+            CharClass.LETTER_F: State.SE,
+            CharClass.LETTER_W: State.SE,
+            CharClass.LETTER_H: State.SE,
+            CharClass.LETTER_L: State.SE,
+            CharClass.LETTER_R: State.SE,
+            CharClass.LETTER_T: State.SE,
+            CharClass.LETTER_U: State.SE,
+            CharClass.LETTER_N: State.SE,
+            CharClass.LETTER_V: State.SE,
+            CharClass.LETTER_O: State.SE,
+            CharClass.LETTER_D: State.SE,
+            CharClass.LETTER_A: State.SE,
+            CharClass.LETTER_S: State.SE,
+            CharClass.LETTER_B: State.SE,
+            CharClass.LETTER_P: State.SE,
+            CharClass.LETTER: State.SE,
+            CharClass.DIGIT: State.SE,
+            CharClass.QUOTE: State.SE,
+            CharClass.EQUAL: State.SE,
+            CharClass.NOT: State.SE,
+            CharClass.LESS: State.SE,
+            CharClass.GREATER: State.SE,
+            CharClass.AMPERSAND: State.SE,
+            CharClass.PIPE: State.IN_LOGICAL_OR,
+            CharClass.PLUS: State.SE,
+            CharClass.MINUS: State.SE,
+            CharClass.STAR: State.SE,
+            CharClass.PERCENT: State.SE,
+            CharClass.OPN_PAREN: State.SE,
+            CharClass.CLS_PAREN: State.SE,
+            CharClass.OPN_BRACE: State.SE,
+            CharClass.CLS_BRACE: State.SE,
+            CharClass.COMMA: State.SE,
+            CharClass.SCOLON: State.SE,
+            CharClass.SPACE: State.SE,    
         },
     }
 
@@ -268,7 +847,7 @@ class Lexer:
         State.IN_LOGICAL_OR, State.IN_PLUS, State.IN_MINUS, State.IN_STAR,
         State.IN_PERCENT, State.IN_LEFT_PAREN, State.IN_RIGHT_PAREN,
         State.IN_LEFT_BRACE, State.IN_RIGHT_BRACE, State.IN_COMMA,
-        State.IN_SEMICOLON
+        State.IN_SCOLON
     }
 
     def get_next_state(self, current_state: State, char_class: CharClass) -> State:
@@ -281,8 +860,48 @@ class Lexer:
         self.column = 1
 
     def classify(self, char: str) -> CharClass | None:
+        match char:
+            case "=": return CharClass.EQUAL
+            case "<": return CharClass.LESS
+            case ">": return CharClass.GREATER
+            case "!": return CharClass.NOT
+            case "+": return CharClass.PLUS
+            case "-": return CharClass.MINUS
+            case "*": return CharClass.STAR
+            case "/": return CharClass.SLASH
+            case "%": return CharClass.PERCENT
+            case '"': return CharClass.QUOTE
+            case "(": return CharClass.OPN_PAREN
+            case "{": return CharClass.OPN_BRACE
+            case ")": return CharClass.CLS_PAREN
+            case "}": return CharClass.CLS_BRACE
+            case " ": return CharClass.SPACE
+            case "\\": return CharClass.INV_SLASH
+            case "&": return CharClass.AMPERSAND
+            case "|": return CharClass.PIPE
+            case ",": return CharClass.COMMA
+            case ";": return CharClass.SCOLON
+            case "i": return CharClass.LETTER_I
+            case "e": return CharClass.LETTER_E
+            case "f": return CharClass.LETTER_F
+            case "w": return CharClass.LETTER_W
+            case "h": return CharClass.LETTER_H
+            case "l": return CharClass.LETTER_L
+            case "r": return CharClass.LETTER_R
+            case "t": return CharClass.LETTER_T
+            case "u": return CharClass.LETTER_U
+            case "n": return CharClass.LETTER_N
+            case "v": return CharClass.LETTER_V
+            case "o": return CharClass.LETTER_O
+            case "d": return CharClass.LETTER_D
+            case "a": return CharClass.LETTER_A
+            case "s": return CharClass.LETTER_S
+            case "b": return CharClass.LETTER_B
+            case "p": return CharClass.LETTER_P
+
         if char.isalpha() or char == '_': return CharClass.LETTER
         if char.isdigit(): return CharClass.DIGIT
+
         return CHAR_CLASS.get(char, None)
 
     def get_next_state(self, current_state: State, char_class: CharClass | None) -> State:
@@ -322,7 +941,7 @@ class Lexer:
             if ch == "/" and self.position + 1 < len(self.source) and self.source[self.position + 1] == "*":
                 self.advance()
                 self.advance()
-                closed = False
+                CLSd = False
                 while self.position < len(self.source):
                     if (
                         self.source[self.position] == "*"
@@ -331,10 +950,10 @@ class Lexer:
                     ):
                         self.advance()
                         self.advance()
-                        closed = True
+                        CLSd = True
                         break
                     self.advance()
-                if not closed:
+                if not CLSd:
                     raise LexerError("Comment not terminated", self.line, self.column)
                 skipped = True
                 continue
