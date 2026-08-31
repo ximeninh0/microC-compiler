@@ -116,6 +116,7 @@ class State(enum.Enum):
     RETURN_3 = 34
     RETURN_4 = 35
     RETURN_5 = 36
+    RETURN_6 = 73
 
     WHILE_1 = 37
     WHILE_2 = 38
@@ -402,7 +403,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_O: State.IN_IDENTIFIER,
         CharClass.LETTER_D: State.IN_IDENTIFIER,
         CharClass.LETTER_A: State.IN_IDENTIFIER,
-        CharClass.LETTER_S: State.IN_ELSE_3,
+        CharClass.LETTER_S: State.ELSE_3,
         CharClass.LETTER_B: State.IN_IDENTIFIER,
         CharClass.LETTER_P: State.IN_IDENTIFIER,
         CharClass.LETTER: State.IN_IDENTIFIER,
@@ -3308,7 +3309,7 @@ TokenType = {
     State.IN_OPN_BRACE : TokenKind.LEFT_BRACE,
     State.IN_CLS_BRACE : TokenKind.RIGHT_BRACE,
     State.IN_COMMA : TokenKind.COMMA,
-    State.IN_SCOLON : TokenKind.SCOLON,
+    State.IN_SCOLON : TokenKind.SEMICOLON,
 
     State.ELSE_1 : TokenKind.IDENTIFIER,
     State.ELSE_2 : TokenKind.IDENTIFIER,
@@ -3370,14 +3371,14 @@ class Lexer:
     state = None
     input_position = 0
     last_final = None
-    last_final_state_position = 0
+    last_final_position = 0
     source = None
-    line = 0
-    column = 0
+    line = 1
+    column = 1
 
-    def rollback_to(self,last_final_state_position):
-        self.state = last_final.state
-        self.input_position = last_final_state_position
+    def rollback(self):
+        self.state = self.last_final
+        self.input_position = self.last_final_position
         
     def __init__(self, source: str):
         self.source = source
@@ -3386,7 +3387,7 @@ class Lexer:
 
     def advance(self) -> None:
         if self.input_position < len(self.source):
-            if self.source[self.input_position] == "\n":
+            if state == State.ENTER_2:
                 self.line += 1
                 self.column = 1
             else:
@@ -3436,27 +3437,47 @@ class Lexer:
         if char.isalpha() or char == '_': return CharClass.LETTER
         if char.isdigit(): return CharClass.DIGIT
 
-        return CHAR_CLASS.get(char, None)
+        return CHAR_CLASS.get(char, None).name
 
 
     def tokens(self) -> Iterator[Token]:
         """Produza todos os tokens significativos e um único EOF ao final."""
-        while state != State.ERROR:
-            if state in final_states:
-                last_final = state
-                last_final_state_position = self.input_position
-                
-            char = self.source[self.input_position]
-            classfied_character = self.classify(char)
-            state = delta[state][classfied_character]
-            self.advance()
-            if last_final:
-                self.rollback_to(self,last_final.input_position)
-                return TokenType[last_final.state]
-            else:
-                return LexerError("Error",0,0)
+        tokens = []
+        while self.input_position < len(self.source):
+            token_column = 0
+            token_line = 0
+            token_lexeme = ""
+            token_value = None
+            token_kind = None
 
-        yield  # mantém este método como gerador durante o desenvolvimento
+            while self.state != State.SE:
+
+                if state in final_states:
+                    self.last_final = self.state 
+                    self.last_final_position = self.input_position
+
+                c = self.source[self.input_position]
+                print(self.classify(c))
+                self.state = delta[self.state][self.classify(c)]
+                if c != '"': token_lexeme += c
+                self.advance()
+
+            self.rollback()
+            token_kind = TokenType[last_final]
+            token_column = self.column
+            token_line = self.line
+
+            if token_kind == TokenKind.IDENTIFIER: token_value = token_lexeme
+            elif token_kind == TokenKind.INT_LITERAL: token_value = int
+            elif token_kind == TokenKind.STRING_LITERAL: token_value = str
+            elif token_kind == TokenKind.KW_TRUE: token_value = True
+            elif token_kind == TokenKind.KW_FALSE: token_value = False
+            else: token_value = None
+            token = Token(token_kind,token_lexeme,token_value,token_line,token_column)
+            tokens += token
+
+        return tokens
+        # yield  # mantém este método como gerador durante o desenvolvimento
 
     def scan(self) -> list[Token]:
         return list(self.tokens())
