@@ -116,7 +116,7 @@ class State(enum.Enum):
     RETURN_3 = 34
     RETURN_4 = 35
     RETURN_5 = 36
-    RETURN_6 = 73
+   #RETURN_6 = '36'(está no final com outro número)
 
     WHILE_1 = 37
     WHILE_2 = 38
@@ -163,8 +163,18 @@ class State(enum.Enum):
 
     SE = 71
 
+    WS = 73
+    RETURN_6 = 74
+
+    COMMENT_2_TYPE_STAR = 75
+    COMMENT_3_TYPE_STAR = 76
+    COMMENT_4_TYPE_STAR = 77
+
+    COMMENT_2_TYPE_SLASH = 78
+    COMMENT_3_TYPE_SLASH = 79
+
     ERROR = -1
-    
+    LEXER_ERROR = -2
 
 
 class CharClass(enum.Enum):
@@ -215,6 +225,8 @@ class CharClass(enum.Enum):
 
     SCOLON = 39
     COMMA = 40
+
+    NEW_LINE = 41
 
 CHAR_CLASS = {
     "=": CharClass.EQUAL,
@@ -292,6 +304,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.IN_PLUS,
         CharClass.MINUS: State.IN_MINUS,
         CharClass.STAR: State.IN_STAR,
+        CharClass.SLASH: State.IN_SLASH,
         CharClass.PERCENT: State.IN_PERCENT,
         CharClass.OPN_PAREN: State.IN_OPN_PAREN,
         CharClass.CLS_PAREN: State.IN_CLS_PAREN,
@@ -299,8 +312,9 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.CLS_BRACE: State.IN_CLS_BRACE,
         CharClass.COMMA: State.IN_COMMA,
         CharClass.SCOLON: State.IN_SCOLON,
-        CharClass.SPACE: State.START,
-        CharClass.INV_SLASH: State.ENTER_1
+        CharClass.SPACE: State.WS,
+        # CharClass.INV_SLASH: State.COMMENT_1,
+        CharClass.NEW_LINE: State.WS
     },
 
 
@@ -334,6 +348,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -342,8 +357,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,
-        CharClass.INV_SLASH: State.SE
-
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 # PALAVRAS RESERVADAS =======================================
@@ -377,6 +392,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -385,7 +401,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,   
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.ELSE_2: {
@@ -418,6 +435,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -426,7 +444,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.ELSE_3: {
@@ -459,6 +478,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -467,7 +487,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.ELSE_4: {
@@ -500,6 +521,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -508,7 +530,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -542,6 +565,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -550,7 +574,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.RETURN_2: {
@@ -561,7 +586,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_H: State.IN_IDENTIFIER,
         CharClass.LETTER_L: State.IN_IDENTIFIER,
         CharClass.LETTER_R: State.IN_IDENTIFIER,
-        CharClass.LETTER_T: State.RETURN_2,
+        CharClass.LETTER_T: State.RETURN_3,
         CharClass.LETTER_U: State.IN_IDENTIFIER,
         CharClass.LETTER_N: State.IN_IDENTIFIER,
         CharClass.LETTER_V: State.IN_IDENTIFIER,
@@ -583,6 +608,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -591,7 +617,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.RETURN_3: {
@@ -624,6 +651,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -632,7 +660,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE, 
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.RETURN_4: {
@@ -665,6 +694,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -673,7 +703,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE, 
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.RETURN_5: {
@@ -686,7 +717,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_R: State.IN_IDENTIFIER,
         CharClass.LETTER_T: State.IN_IDENTIFIER,
         CharClass.LETTER_U: State.IN_IDENTIFIER,
-        CharClass.LETTER_N: State.RETURN_5,
+        CharClass.LETTER_N: State.RETURN_6,
         CharClass.LETTER_V: State.IN_IDENTIFIER,
         CharClass.LETTER_O: State.IN_IDENTIFIER,
         CharClass.LETTER_D: State.IN_IDENTIFIER,
@@ -706,6 +737,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -714,7 +746,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.RETURN_6: {
@@ -747,6 +780,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -755,7 +789,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -789,6 +824,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -797,7 +833,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.WHILE_2: {
@@ -830,6 +867,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -838,7 +876,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.WHILE_3: {
@@ -871,6 +910,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -879,7 +919,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.WHILE_4: {
@@ -912,6 +953,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -920,7 +962,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.WHILE_5: {
@@ -953,6 +996,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -961,7 +1005,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -995,6 +1040,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1003,7 +1049,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.PRINT_2: {
@@ -1036,6 +1083,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1044,7 +1092,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.PRINT_3: {
@@ -1057,7 +1106,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_R: State.IN_IDENTIFIER,
         CharClass.LETTER_T: State.IN_IDENTIFIER,
         CharClass.LETTER_U: State.IN_IDENTIFIER,
-        CharClass.LETTER_N: State.PRINT_3,
+        CharClass.LETTER_N: State.PRINT_4,
         CharClass.LETTER_V: State.IN_IDENTIFIER,
         CharClass.LETTER_O: State.IN_IDENTIFIER,
         CharClass.LETTER_D: State.IN_IDENTIFIER,
@@ -1077,6 +1126,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1085,7 +1135,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.PRINT_4: {
@@ -1096,7 +1147,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_H: State.IN_IDENTIFIER,
         CharClass.LETTER_L: State.IN_IDENTIFIER,
         CharClass.LETTER_R: State.IN_IDENTIFIER,
-        CharClass.LETTER_T: State.PRINT_3,
+        CharClass.LETTER_T: State.PRINT_5,
         CharClass.LETTER_U: State.IN_IDENTIFIER,
         CharClass.LETTER_N: State.IN_IDENTIFIER,
         CharClass.LETTER_V: State.IN_IDENTIFIER,
@@ -1118,6 +1169,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1126,7 +1178,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.PRINT_5: {
@@ -1159,6 +1212,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1167,7 +1221,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -1201,6 +1256,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1209,7 +1265,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE, 
-        CharClass.INV_SLASH: State.SE 
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE 
     },
 
     State.FALSE_2: {
@@ -1218,7 +1275,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_F: State.IN_IDENTIFIER,
         CharClass.LETTER_W: State.IN_IDENTIFIER,
         CharClass.LETTER_H: State.IN_IDENTIFIER,
-        CharClass.LETTER_L: State.FALSE_2,
+        CharClass.LETTER_L: State.FALSE_3,
         CharClass.LETTER_R: State.IN_IDENTIFIER,
         CharClass.LETTER_T: State.IN_IDENTIFIER,
         CharClass.LETTER_U: State.IN_IDENTIFIER,
@@ -1242,6 +1299,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1250,7 +1308,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.FALSE_3: {
@@ -1268,7 +1327,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.LETTER_O: State.IN_IDENTIFIER,
         CharClass.LETTER_D: State.IN_IDENTIFIER,
         CharClass.LETTER_A: State.IN_IDENTIFIER,
-        CharClass.LETTER_S: State.FALSE_3,
+        CharClass.LETTER_S: State.FALSE_4,
         CharClass.LETTER_B: State.IN_IDENTIFIER,
         CharClass.LETTER_P: State.IN_IDENTIFIER,
         CharClass.LETTER: State.IN_IDENTIFIER,
@@ -1283,6 +1342,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1291,7 +1351,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.FALSE_4: {
@@ -1324,6 +1385,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1332,7 +1394,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.FALSE_5: {
@@ -1365,6 +1428,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1373,7 +1437,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -1407,6 +1472,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1415,7 +1481,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.TRUE_2: {
@@ -1448,6 +1515,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1456,7 +1524,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.TRUE_3: {
@@ -1489,6 +1558,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1497,7 +1567,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.TRUE_4: {
@@ -1530,6 +1601,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1538,7 +1610,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.VOID_1: {
@@ -1571,6 +1644,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1579,7 +1653,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.VOID_2: {
@@ -1612,6 +1687,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1620,7 +1696,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.VOID_3: {
@@ -1653,6 +1730,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1661,7 +1739,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.VOID_4: {
@@ -1694,6 +1773,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1702,7 +1782,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.BOOL_1: {
@@ -1735,6 +1816,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1743,7 +1825,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.BOOL_2: {
@@ -1776,6 +1859,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1784,7 +1868,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.BOOL_3: {
@@ -1817,6 +1902,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1825,7 +1911,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.BOOL_4: {
@@ -1858,6 +1945,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1866,7 +1954,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -1900,6 +1989,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1908,7 +1998,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -1942,6 +2033,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1950,7 +2042,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -1984,6 +2077,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -1992,7 +2086,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.INT_3: {
@@ -2025,6 +2120,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2033,7 +2129,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,  
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 #============================================================
 
@@ -2068,6 +2165,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.IN_STRING,
         CharClass.MINUS: State.IN_STRING,
         CharClass.STAR: State.IN_STRING,
+        CharClass.SLASH: State.IN_STRING,
         CharClass.PERCENT: State.IN_STRING,
         CharClass.OPN_PAREN: State.IN_STRING,
         CharClass.CLS_PAREN: State.IN_STRING,
@@ -2076,7 +2174,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.IN_STRING,
         CharClass.SCOLON: State.IN_STRING,
         CharClass.SPACE: State.IN_STRING,
-        CharClass.INV_SLASH: State.IN_STRING
+        CharClass.INV_SLASH: State.IN_STRING,
+        CharClass.NEW_LINE : State.IN_STRING
     },
 
     State.IN_STRING_END: {
@@ -2109,6 +2208,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2117,7 +2217,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -2151,6 +2252,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2159,7 +2261,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,     
-        CharClass.INV_SLASH: State.SE   
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE   
     },
 
 
@@ -2193,6 +2296,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2201,7 +2305,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
 
@@ -2235,6 +2340,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2243,7 +2349,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,       
-        CharClass.INV_SLASH: State.SE 
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE 
     },
 
 
@@ -2276,7 +2383,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PIPE: State.SE,
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
-        CharClass.STAR: State.SE,
+        CharClass.STAR: State.COMMENT_2_TYPE_STAR,
+        CharClass.SLASH: State.COMMENT_2_TYPE_SLASH,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2285,7 +2393,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,       
-        CharClass.INV_SLASH: State.SE 
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE 
     },
 
 
@@ -2319,6 +2428,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2327,7 +2437,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,
-        CharClass.INV_SLASH: State.SE        
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE        
     },
 
 
@@ -2361,6 +2472,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2369,7 +2481,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,   
-        CharClass.INV_SLASH: State.SE     
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE     
     },
 
 
@@ -2403,6 +2516,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2411,7 +2525,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,     
-        CharClass.INV_SLASH: State.SE   
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE   
     },
 
 
@@ -2445,6 +2560,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2453,7 +2569,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,       
-        CharClass.INV_SLASH: State.SE 
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE 
     },
 
 
@@ -2487,6 +2604,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2495,7 +2613,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,        
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 
@@ -2529,6 +2648,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2537,7 +2657,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
     State.IN_EQUAL_EQUAL: {
@@ -2570,6 +2691,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2578,7 +2700,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,   
-        CharClass.INV_SLASH: State.SE     
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE     
     },
 
 
@@ -2612,6 +2735,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2620,7 +2744,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
     State.IN_NOT_EQUAL: {
@@ -2653,6 +2778,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2661,49 +2787,52 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
 # TODO: Deveria retornar erro ? 
     State.IN_AMPERSAND: {
-        CharClass.LETTER_I: State.SE,
-        CharClass.LETTER_E: State.SE,
-        CharClass.LETTER_F: State.SE,
-        CharClass.LETTER_W: State.SE,
-        CharClass.LETTER_H: State.SE,
-        CharClass.LETTER_L: State.SE,
-        CharClass.LETTER_R: State.SE,
-        CharClass.LETTER_T: State.SE,
-        CharClass.LETTER_U: State.SE,
-        CharClass.LETTER_N: State.SE,
-        CharClass.LETTER_V: State.SE,
-        CharClass.LETTER_O: State.SE,
-        CharClass.LETTER_D: State.SE,
-        CharClass.LETTER_A: State.SE,
-        CharClass.LETTER_S: State.SE,
-        CharClass.LETTER_B: State.SE,
-        CharClass.LETTER_P: State.SE,
-        CharClass.LETTER: State.SE,
-        CharClass.DIGIT: State.SE,
-        CharClass.QUOTE: State.SE,
-        CharClass.EQUAL: State.SE,
-        CharClass.NOT: State.SE,
-        CharClass.LESS: State.SE,
-        CharClass.GREATER: State.SE,
+        CharClass.LETTER_I: State.LEXER_ERROR,
+        CharClass.LETTER_E: State.LEXER_ERROR,
+        CharClass.LETTER_F: State.LEXER_ERROR,
+        CharClass.LETTER_W: State.LEXER_ERROR,
+        CharClass.LETTER_H: State.LEXER_ERROR,
+        CharClass.LETTER_L: State.LEXER_ERROR,
+        CharClass.LETTER_R: State.LEXER_ERROR,
+        CharClass.LETTER_T: State.LEXER_ERROR,
+        CharClass.LETTER_U: State.LEXER_ERROR,
+        CharClass.LETTER_N: State.LEXER_ERROR,
+        CharClass.LETTER_V: State.LEXER_ERROR,
+        CharClass.LETTER_O: State.LEXER_ERROR,
+        CharClass.LETTER_D: State.LEXER_ERROR,
+        CharClass.LETTER_A: State.LEXER_ERROR,
+        CharClass.LETTER_S: State.LEXER_ERROR,
+        CharClass.LETTER_B: State.LEXER_ERROR,
+        CharClass.LETTER_P: State.LEXER_ERROR,
+        CharClass.LETTER: State.LEXER_ERROR,
+        CharClass.DIGIT: State.LEXER_ERROR,
+        CharClass.QUOTE: State.LEXER_ERROR,
+        CharClass.EQUAL: State.LEXER_ERROR,
+        CharClass.NOT: State.LEXER_ERROR,
+        CharClass.LESS: State.LEXER_ERROR,
+        CharClass.GREATER: State.LEXER_ERROR,
         CharClass.AMPERSAND: State.IN_LOGICAL_AND,
-        CharClass.PIPE: State.SE,
-        CharClass.PLUS: State.SE,
-        CharClass.MINUS: State.SE,
-        CharClass.STAR: State.SE,
-        CharClass.PERCENT: State.SE,
-        CharClass.OPN_PAREN: State.SE,
-        CharClass.CLS_PAREN: State.SE,
-        CharClass.OPN_BRACE: State.SE,
-        CharClass.CLS_BRACE: State.SE,
-        CharClass.COMMA: State.SE,
-        CharClass.SCOLON: State.SE,
-        CharClass.SPACE: State.SE,       
-        CharClass.INV_SLASH: State.SE 
+        CharClass.PIPE: State.LEXER_ERROR,
+        CharClass.PLUS: State.LEXER_ERROR,
+        CharClass.MINUS: State.LEXER_ERROR,
+        CharClass.STAR: State.LEXER_ERROR,
+        CharClass.SLASH: State.LEXER_ERROR,
+        CharClass.PERCENT: State.LEXER_ERROR,
+        CharClass.OPN_PAREN: State.LEXER_ERROR,
+        CharClass.CLS_PAREN: State.LEXER_ERROR,
+        CharClass.OPN_BRACE: State.LEXER_ERROR,
+        CharClass.CLS_BRACE: State.LEXER_ERROR,
+        CharClass.COMMA: State.LEXER_ERROR,
+        CharClass.SCOLON: State.LEXER_ERROR,
+        CharClass.SPACE: State.LEXER_ERROR,       
+        CharClass.INV_SLASH: State.LEXER_ERROR,
+        CharClass.NEW_LINE : State.LEXER_ERROR 
     },
 
     State.IN_LOGICAL_AND: {
@@ -2736,6 +2865,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2744,49 +2874,52 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,        
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
 # TODO: Deveria retornar erro ? 
     State.IN_PIPE: {
-        CharClass.LETTER_I: State.SE,
-        CharClass.LETTER_E: State.SE,
-        CharClass.LETTER_F: State.SE,
-        CharClass.LETTER_W: State.SE,
-        CharClass.LETTER_H: State.SE,
-        CharClass.LETTER_L: State.SE,
-        CharClass.LETTER_R: State.SE,
-        CharClass.LETTER_T: State.SE,
-        CharClass.LETTER_U: State.SE,
-        CharClass.LETTER_N: State.SE,
-        CharClass.LETTER_V: State.SE,
-        CharClass.LETTER_O: State.SE,
-        CharClass.LETTER_D: State.SE,
-        CharClass.LETTER_A: State.SE,
-        CharClass.LETTER_S: State.SE,
-        CharClass.LETTER_B: State.SE,
-        CharClass.LETTER_P: State.SE,
-        CharClass.LETTER: State.SE,
-        CharClass.DIGIT: State.SE,
-        CharClass.QUOTE: State.SE,
-        CharClass.EQUAL: State.SE,
-        CharClass.NOT: State.SE,
-        CharClass.LESS: State.SE,
-        CharClass.GREATER: State.SE,
-        CharClass.AMPERSAND: State.SE,
+        CharClass.LETTER_I: State.LEXER_ERROR,
+        CharClass.LETTER_E: State.LEXER_ERROR,
+        CharClass.LETTER_F: State.LEXER_ERROR,
+        CharClass.LETTER_W: State.LEXER_ERROR,
+        CharClass.LETTER_H: State.LEXER_ERROR,
+        CharClass.LETTER_L: State.LEXER_ERROR,
+        CharClass.LETTER_R: State.LEXER_ERROR,
+        CharClass.LETTER_T: State.LEXER_ERROR,
+        CharClass.LETTER_U: State.LEXER_ERROR,
+        CharClass.LETTER_N: State.LEXER_ERROR,
+        CharClass.LETTER_V: State.LEXER_ERROR,
+        CharClass.LETTER_O: State.LEXER_ERROR,
+        CharClass.LETTER_D: State.LEXER_ERROR,
+        CharClass.LETTER_A: State.LEXER_ERROR,
+        CharClass.LETTER_S: State.LEXER_ERROR,
+        CharClass.LETTER_B: State.LEXER_ERROR,
+        CharClass.LETTER_P: State.LEXER_ERROR,
+        CharClass.LETTER: State.LEXER_ERROR,
+        CharClass.DIGIT: State.LEXER_ERROR,
+        CharClass.QUOTE: State.LEXER_ERROR,
+        CharClass.EQUAL: State.LEXER_ERROR,
+        CharClass.NOT: State.LEXER_ERROR,
+        CharClass.LESS: State.LEXER_ERROR,
+        CharClass.GREATER: State.LEXER_ERROR,
+        CharClass.AMPERSAND: State.LEXER_ERROR,
         CharClass.PIPE: State.IN_LOGICAL_OR,
-        CharClass.PLUS: State.SE,
-        CharClass.MINUS: State.SE,
-        CharClass.STAR: State.SE,
-        CharClass.PERCENT: State.SE,
-        CharClass.OPN_PAREN: State.SE,
-        CharClass.CLS_PAREN: State.SE,
-        CharClass.OPN_BRACE: State.SE,
-        CharClass.CLS_BRACE: State.SE,
-        CharClass.COMMA: State.SE,
-        CharClass.SCOLON: State.SE,
-        CharClass.SPACE: State.SE,        
-        CharClass.INV_SLASH: State.SE
+        CharClass.PLUS: State.LEXER_ERROR,
+        CharClass.MINUS: State.LEXER_ERROR,
+        CharClass.STAR: State.LEXER_ERROR,
+        CharClass.SLASH: State.LEXER_ERROR,
+        CharClass.PERCENT: State.LEXER_ERROR,
+        CharClass.OPN_PAREN: State.LEXER_ERROR,
+        CharClass.CLS_PAREN: State.LEXER_ERROR,
+        CharClass.OPN_BRACE: State.LEXER_ERROR,
+        CharClass.CLS_BRACE: State.LEXER_ERROR,
+        CharClass.COMMA: State.LEXER_ERROR,
+        CharClass.SCOLON: State.LEXER_ERROR,
+        CharClass.SPACE: State.LEXER_ERROR,        
+        CharClass.INV_SLASH: State.LEXER_ERROR,
+        CharClass.NEW_LINE : State.LEXER_ERROR
     },
 
     State.IN_LOGICAL_OR: {
@@ -2819,6 +2952,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2827,7 +2961,51 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE, 
-        CharClass.INV_SLASH: State.SE       
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE       
+    },
+
+    State.IN_OPN_PAREN: {
+        CharClass.LETTER_I: State.SE,
+        CharClass.LETTER_E: State.SE,
+        CharClass.LETTER_F: State.SE,
+        CharClass.LETTER_W: State.SE,
+        CharClass.LETTER_H: State.SE,
+        CharClass.LETTER_L: State.SE,
+        CharClass.LETTER_R: State.SE,
+        CharClass.LETTER_T: State.SE,
+        CharClass.LETTER_U: State.SE,
+        CharClass.LETTER_N: State.SE,
+        CharClass.LETTER_V: State.SE,
+        CharClass.LETTER_O: State.SE,
+        CharClass.LETTER_D: State.SE,
+        CharClass.LETTER_A: State.SE,
+        CharClass.LETTER_S: State.SE,
+        CharClass.LETTER_B: State.SE,
+        CharClass.LETTER_P: State.SE,
+        CharClass.LETTER: State.SE,
+        CharClass.DIGIT: State.SE,
+        CharClass.QUOTE: State.SE,
+        CharClass.EQUAL: State.SE,
+        CharClass.NOT: State.SE,
+        CharClass.LESS: State.SE,
+        CharClass.GREATER: State.SE,
+        CharClass.AMPERSAND: State.SE,
+        CharClass.PIPE: State.SE,
+        CharClass.PLUS: State.SE,
+        CharClass.MINUS: State.SE,
+        CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
+        CharClass.PERCENT: State.SE,
+        CharClass.OPN_PAREN: State.SE,
+        CharClass.CLS_PAREN: State.SE,
+        CharClass.OPN_BRACE: State.SE,
+        CharClass.CLS_BRACE: State.SE,
+        CharClass.COMMA: State.SE,
+        CharClass.SCOLON: State.SE,
+        CharClass.SPACE: State.SE,        
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.IN_OPN_BRACE: {
@@ -2860,6 +3038,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2868,48 +3047,9 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,        
-        CharClass.INV_SLASH: State.SE
-    },
-
-    State.IN_OPN_BRACE: {
-        CharClass.LETTER_I: State.SE,
-        CharClass.LETTER_E: State.SE,
-        CharClass.LETTER_F: State.SE,
-        CharClass.LETTER_W: State.SE,
-        CharClass.LETTER_H: State.SE,
-        CharClass.LETTER_L: State.SE,
-        CharClass.LETTER_R: State.SE,
-        CharClass.LETTER_T: State.SE,
-        CharClass.LETTER_U: State.SE,
-        CharClass.LETTER_N: State.SE,
-        CharClass.LETTER_V: State.SE,
-        CharClass.LETTER_O: State.SE,
-        CharClass.LETTER_D: State.SE,
-        CharClass.LETTER_A: State.SE,
-        CharClass.LETTER_S: State.SE,
-        CharClass.LETTER_B: State.SE,
-        CharClass.LETTER_P: State.SE,
-        CharClass.LETTER: State.SE,
-        CharClass.DIGIT: State.SE,
-        CharClass.QUOTE: State.SE,
-        CharClass.EQUAL: State.SE,
-        CharClass.NOT: State.SE,
-        CharClass.LESS: State.SE,
-        CharClass.GREATER: State.SE,
-        CharClass.AMPERSAND: State.SE,
-        CharClass.PIPE: State.SE,
-        CharClass.PLUS: State.SE,
-        CharClass.MINUS: State.SE,
-        CharClass.STAR: State.SE,
-        CharClass.PERCENT: State.SE,
-        CharClass.OPN_PAREN: State.SE,
-        CharClass.CLS_PAREN: State.SE,
-        CharClass.OPN_BRACE: State.SE,
-        CharClass.CLS_BRACE: State.SE,
-        CharClass.COMMA: State.SE,
-        CharClass.SCOLON: State.SE,
-        CharClass.SPACE: State.SE,        
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE,
+        
     },
 
     State.IN_CLS_PAREN: {
@@ -2942,6 +3082,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2950,7 +3091,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,        
-        CharClass.INV_SLASH: State.SE
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 
     State.IN_CLS_BRACE: {
@@ -2983,6 +3125,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -2991,7 +3134,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,   
-        CharClass.INV_SLASH: State.SE     
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE     
     },
 
     State.IN_COMMA: {
@@ -3024,6 +3168,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -3032,7 +3177,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,     
-        CharClass.INV_SLASH: State.SE   
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE   
     },
 
     State.IN_SCOLON: {
@@ -3065,6 +3211,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -3073,7 +3220,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
 # NÚMEROS INTEIROS ============================================
@@ -3107,6 +3255,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -3115,7 +3264,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
     State.ENTER_1: {
@@ -3148,6 +3298,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -3156,7 +3307,8 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
     },
 
     State.ENTER_2: {
@@ -3189,6 +3341,7 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.PLUS: State.SE,
         CharClass.MINUS: State.SE,
         CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
         CharClass.PERCENT: State.SE,
         CharClass.OPN_PAREN: State.SE,
         CharClass.CLS_PAREN: State.SE,
@@ -3197,7 +3350,266 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.SE,
         CharClass.SCOLON: State.SE,
         CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE  
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE  
+    },
+
+    State.WS: {
+        CharClass.LETTER_I: State.SE,
+        CharClass.LETTER_E: State.SE,
+        CharClass.LETTER_F: State.SE,
+        CharClass.LETTER_W: State.SE,
+        CharClass.LETTER_H: State.SE,
+        CharClass.LETTER_L: State.SE,
+        CharClass.LETTER_R: State.SE,
+        CharClass.LETTER_T: State.SE,
+        CharClass.LETTER_U: State.SE,
+        CharClass.LETTER_N: State.SE,
+        CharClass.LETTER_V: State.SE,
+        CharClass.LETTER_O: State.SE,
+        CharClass.LETTER_D: State.SE,
+        CharClass.LETTER_A: State.SE,
+        CharClass.LETTER_S: State.SE,
+        CharClass.LETTER_B: State.SE,
+        CharClass.LETTER_P: State.SE,
+        CharClass.LETTER: State.SE,
+        CharClass.DIGIT: State.SE,
+        CharClass.QUOTE: State.SE,
+        CharClass.EQUAL: State.SE,
+        CharClass.NOT: State.SE,
+        CharClass.LESS: State.SE,
+        CharClass.GREATER: State.SE,
+        CharClass.AMPERSAND: State.SE,
+        CharClass.PIPE: State.SE,
+        CharClass.PLUS: State.SE,
+        CharClass.MINUS: State.SE,
+        CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
+        CharClass.PERCENT: State.SE,
+        CharClass.OPN_PAREN: State.SE,
+        CharClass.CLS_PAREN: State.SE,
+        CharClass.OPN_BRACE: State.SE,
+        CharClass.CLS_BRACE: State.SE,
+        CharClass.COMMA: State.SE,
+        CharClass.SCOLON: State.SE,
+        CharClass.SPACE: State.WS,      
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.WS
+    },
+
+    State.COMMENT_2_TYPE_STAR: {
+        CharClass.LETTER_I: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_E: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_F: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_W: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_H: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_L: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_R: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_T: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_U: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_N: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_V: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_O: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_D: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_A: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_S: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_B: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_P: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER: State.COMMENT_2_TYPE_STAR,
+        CharClass.DIGIT: State.COMMENT_2_TYPE_STAR,
+        CharClass.QUOTE: State.COMMENT_2_TYPE_STAR,
+        CharClass.EQUAL: State.COMMENT_2_TYPE_STAR,
+        CharClass.NOT: State.COMMENT_2_TYPE_STAR,
+        CharClass.LESS: State.COMMENT_2_TYPE_STAR,
+        CharClass.GREATER: State.COMMENT_2_TYPE_STAR,
+        CharClass.AMPERSAND: State.COMMENT_2_TYPE_STAR,
+        CharClass.PIPE: State.COMMENT_2_TYPE_STAR,
+        CharClass.PLUS: State.COMMENT_2_TYPE_STAR,
+        CharClass.MINUS: State.COMMENT_2_TYPE_STAR,
+        CharClass.STAR: State.COMMENT_3_TYPE_STAR,
+        CharClass.SLASH: State.COMMENT_2_TYPE_STAR,
+        CharClass.PERCENT: State.COMMENT_2_TYPE_STAR,
+        CharClass.OPN_PAREN: State.COMMENT_2_TYPE_STAR,
+        CharClass.CLS_PAREN: State.COMMENT_2_TYPE_STAR,
+        CharClass.OPN_BRACE: State.COMMENT_2_TYPE_STAR,
+        CharClass.CLS_BRACE: State.COMMENT_2_TYPE_STAR,
+        CharClass.COMMA: State.COMMENT_2_TYPE_STAR,
+        CharClass.SCOLON: State.COMMENT_2_TYPE_STAR,
+        CharClass.SPACE: State.COMMENT_2_TYPE_STAR,      
+        CharClass.INV_SLASH: State.COMMENT_2_TYPE_STAR,
+        CharClass.NEW_LINE : State.COMMENT_2_TYPE_STAR
+    },
+
+    State.COMMENT_3_TYPE_STAR: {
+        CharClass.LETTER_I: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_E: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_F: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_W: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_H: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_L: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_R: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_T: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_U: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_N: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_V: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_O: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_D: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_A: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_S: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_B: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER_P: State.COMMENT_2_TYPE_STAR,
+        CharClass.LETTER: State.COMMENT_2_TYPE_STAR,
+        CharClass.DIGIT: State.COMMENT_2_TYPE_STAR,
+        CharClass.QUOTE: State.COMMENT_2_TYPE_STAR,
+        CharClass.EQUAL: State.COMMENT_2_TYPE_STAR,
+        CharClass.NOT: State.COMMENT_2_TYPE_STAR,
+        CharClass.LESS: State.COMMENT_2_TYPE_STAR,
+        CharClass.GREATER: State.COMMENT_2_TYPE_STAR,
+        CharClass.AMPERSAND: State.COMMENT_2_TYPE_STAR,
+        CharClass.PIPE: State.COMMENT_2_TYPE_STAR,
+        CharClass.PLUS: State.COMMENT_2_TYPE_STAR,
+        CharClass.MINUS: State.COMMENT_2_TYPE_STAR,
+        CharClass.STAR: State.COMMENT_2_TYPE_STAR,
+        CharClass.SLASH: State.COMMENT_4_TYPE_STAR,
+        CharClass.PERCENT: State.COMMENT_2_TYPE_STAR,
+        CharClass.OPN_PAREN: State.COMMENT_2_TYPE_STAR,
+        CharClass.CLS_PAREN: State.COMMENT_2_TYPE_STAR,
+        CharClass.OPN_BRACE: State.COMMENT_2_TYPE_STAR,
+        CharClass.CLS_BRACE: State.COMMENT_2_TYPE_STAR,
+        CharClass.COMMA: State.COMMENT_2_TYPE_STAR,
+        CharClass.SCOLON: State.COMMENT_2_TYPE_STAR,
+        CharClass.SPACE: State.COMMENT_2_TYPE_STAR,      
+        CharClass.INV_SLASH: State.COMMENT_2_TYPE_STAR,
+        CharClass.NEW_LINE : State.COMMENT_2_TYPE_STAR
+    },
+
+    State.COMMENT_4_TYPE_STAR: {
+        CharClass.LETTER_I: State.SE,
+        CharClass.LETTER_E: State.SE,
+        CharClass.LETTER_F: State.SE,
+        CharClass.LETTER_W: State.SE,
+        CharClass.LETTER_H: State.SE,
+        CharClass.LETTER_L: State.SE,
+        CharClass.LETTER_R: State.SE,
+        CharClass.LETTER_T: State.SE,
+        CharClass.LETTER_U: State.SE,
+        CharClass.LETTER_N: State.SE,
+        CharClass.LETTER_V: State.SE,
+        CharClass.LETTER_O: State.SE,
+        CharClass.LETTER_D: State.SE,
+        CharClass.LETTER_A: State.SE,
+        CharClass.LETTER_S: State.SE,
+        CharClass.LETTER_B: State.SE,
+        CharClass.LETTER_P: State.SE,
+        CharClass.LETTER: State.SE,
+        CharClass.DIGIT: State.SE,
+        CharClass.QUOTE: State.SE,
+        CharClass.EQUAL: State.SE,
+        CharClass.NOT: State.SE,
+        CharClass.LESS: State.SE,
+        CharClass.GREATER: State.SE,
+        CharClass.AMPERSAND: State.SE,
+        CharClass.PIPE: State.SE,
+        CharClass.PLUS: State.SE,
+        CharClass.MINUS: State.SE,
+        CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
+        CharClass.PERCENT: State.SE,
+        CharClass.OPN_PAREN: State.SE,
+        CharClass.CLS_PAREN: State.SE,
+        CharClass.OPN_BRACE: State.SE,
+        CharClass.CLS_BRACE: State.SE,
+        CharClass.COMMA: State.SE,
+        CharClass.SCOLON: State.SE,
+        CharClass.SPACE: State.SE,      
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
+    },
+
+    State.COMMENT_2_TYPE_SLASH: {
+        CharClass.LETTER_I: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_E: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_F: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_W: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_H: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_L: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_R: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_T: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_U: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_N: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_V: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_O: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_D: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_A: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_S: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_B: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER_P: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LETTER: State.COMMENT_2_TYPE_SLASH,
+        CharClass.DIGIT: State.COMMENT_2_TYPE_SLASH,
+        CharClass.QUOTE: State.COMMENT_2_TYPE_SLASH,
+        CharClass.EQUAL: State.COMMENT_2_TYPE_SLASH,
+        CharClass.NOT: State.COMMENT_2_TYPE_SLASH,
+        CharClass.LESS: State.COMMENT_2_TYPE_SLASH,
+        CharClass.GREATER: State.COMMENT_2_TYPE_SLASH,
+        CharClass.AMPERSAND: State.COMMENT_2_TYPE_SLASH,
+        CharClass.PIPE: State.COMMENT_2_TYPE_SLASH,
+        CharClass.PLUS: State.COMMENT_2_TYPE_SLASH,
+        CharClass.MINUS: State.COMMENT_2_TYPE_SLASH,
+        CharClass.STAR: State.COMMENT_2_TYPE_SLASH,
+        CharClass.SLASH: State.COMMENT_2_TYPE_SLASH,
+        CharClass.PERCENT: State.COMMENT_2_TYPE_SLASH,
+        CharClass.OPN_PAREN: State.COMMENT_2_TYPE_SLASH,
+        CharClass.CLS_PAREN: State.COMMENT_2_TYPE_SLASH,
+        CharClass.OPN_BRACE: State.COMMENT_2_TYPE_SLASH,
+        CharClass.CLS_BRACE: State.COMMENT_2_TYPE_SLASH,
+        CharClass.COMMA: State.COMMENT_2_TYPE_SLASH,
+        CharClass.SCOLON: State.COMMENT_2_TYPE_SLASH,
+        CharClass.SPACE: State.COMMENT_2_TYPE_SLASH,      
+        CharClass.INV_SLASH: State.COMMENT_2_TYPE_SLASH,
+        CharClass.NEW_LINE : State.COMMENT_3_TYPE_SLASH
+    },
+
+    State.COMMENT_3_TYPE_SLASH: {
+        CharClass.LETTER_I: State.SE,
+        CharClass.LETTER_E: State.SE,
+        CharClass.LETTER_F: State.SE,
+        CharClass.LETTER_W: State.SE,
+        CharClass.LETTER_H: State.SE,
+        CharClass.LETTER_L: State.SE,
+        CharClass.LETTER_R: State.SE,
+        CharClass.LETTER_T: State.SE,
+        CharClass.LETTER_U: State.SE,
+        CharClass.LETTER_N: State.SE,
+        CharClass.LETTER_V: State.SE,
+        CharClass.LETTER_O: State.SE,
+        CharClass.LETTER_D: State.SE,
+        CharClass.LETTER_A: State.SE,
+        CharClass.LETTER_S: State.SE,
+        CharClass.LETTER_B: State.SE,
+        CharClass.LETTER_P: State.SE,
+        CharClass.LETTER: State.SE,
+        CharClass.DIGIT: State.SE,
+        CharClass.QUOTE: State.SE,
+        CharClass.EQUAL: State.SE,
+        CharClass.NOT: State.SE,
+        CharClass.LESS: State.SE,
+        CharClass.GREATER: State.SE,
+        CharClass.AMPERSAND: State.SE,
+        CharClass.PIPE: State.SE,
+        CharClass.PLUS: State.SE,
+        CharClass.MINUS: State.SE,
+        CharClass.STAR: State.SE,
+        CharClass.SLASH: State.SE,
+        CharClass.PERCENT: State.SE,
+        CharClass.OPN_PAREN: State.SE,
+        CharClass.CLS_PAREN: State.SE,
+        CharClass.OPN_BRACE: State.SE,
+        CharClass.CLS_BRACE: State.SE,
+        CharClass.COMMA: State.SE,
+        CharClass.SCOLON: State.SE,
+        CharClass.SPACE: State.SE,      
+        CharClass.INV_SLASH: State.SE,
+        CharClass.NEW_LINE : State.SE
     },
 }
 
@@ -3240,6 +3652,7 @@ final_states = {
     State.RETURN_3,
     State.RETURN_4,
     State.RETURN_5,
+    State.RETURN_6,
 
     State.WHILE_1,
     State.WHILE_2,
@@ -3281,6 +3694,12 @@ final_states = {
     State.INT_2,
     State.INT_3,
 
+    State.WS,
+
+    State.COMMENT_4_TYPE_STAR,
+    State.COMMENT_3_TYPE_SLASH,
+    State.COMMENT_2_TYPE_SLASH
+
 }
 
 TokenType = {
@@ -3320,7 +3739,9 @@ TokenType = {
     State.RETURN_2 : TokenKind.IDENTIFIER,
     State.RETURN_3 : TokenKind.IDENTIFIER,
     State.RETURN_4 : TokenKind.IDENTIFIER,
-    State.RETURN_5 : TokenKind.KW_RETURN,
+    State.RETURN_5 : TokenKind.IDENTIFIER,
+    State.RETURN_6 : TokenKind.KW_RETURN,
+
 
     State.WHILE_1 : TokenKind.IDENTIFIER,
     State.WHILE_2 : TokenKind.IDENTIFIER,
@@ -3362,6 +3783,12 @@ TokenType = {
     State.INT_2 : TokenKind.IDENTIFIER,
     State.INT_3 : TokenKind.KW_INT,
 
+    State.WS : None,
+
+    State.COMMENT_4_TYPE_STAR : None,
+    State.COMMENT_3_TYPE_SLASH : None,
+    State.COMMENT_2_TYPE_SLASH : None
+
     #State.ENTER_2 : TODO: o que colocar aqui ?
 
 }
@@ -3377,17 +3804,18 @@ class Lexer:
     column = 1
 
     def rollback(self):
-        self.state = self.last_final
+        self.state = State.START
         self.input_position = self.last_final_position
         
     def __init__(self, source: str):
         self.source = source
         self.state = State.START
+        self.last_final_position = self.input_position
         # TODO: inicialize aqui o estado exigido por sua estratégia.
 
-    def advance(self) -> None:
+    def advance(self, c) -> None:
         if self.input_position < len(self.source):
-            if state == State.ENTER_2:
+            if c == CharClass.NEW_LINE:
                 self.line += 1
                 self.column = 1
             else:
@@ -3410,7 +3838,8 @@ class Lexer:
             case "{": return CharClass.OPN_BRACE
             case ")": return CharClass.CLS_PAREN
             case "}": return CharClass.CLS_BRACE
-            case " ": return CharClass.SPACE
+            case " " | '\t': return CharClass.SPACE
+            case "\n": return CharClass.NEW_LINE
             case "\\": return CharClass.INV_SLASH
             case "&": return CharClass.AMPERSAND
             case "|": return CharClass.PIPE
@@ -3433,17 +3862,21 @@ class Lexer:
             case "s": return CharClass.LETTER_S
             case "b": return CharClass.LETTER_B
             case "p": return CharClass.LETTER_P
+            case ".": return CharClass.LETTER
 
         if char.isalpha() or char == '_': return CharClass.LETTER
         if char.isdigit(): return CharClass.DIGIT
 
-        return CHAR_CLASS.get(char, None).name
+        return CHAR_CLASS.get(char)
 
 
     def tokens(self) -> Iterator[Token]:
         """Produza todos os tokens significativos e um único EOF ao final."""
         tokens = []
         while self.input_position < len(self.source):
+            start_line = self.line
+            start_column = self.column
+
             token_column = 0
             token_line = 0
             token_lexeme = ""
@@ -3452,30 +3885,55 @@ class Lexer:
 
             while self.state != State.SE:
 
-                if state in final_states:
-                    self.last_final = self.state 
+                if self.state in final_states:
+                    self.last_final = self.state
                     self.last_final_position = self.input_position
+                    print("LAST FINAL: ",self.last_final)
+
+                if self.input_position >= len(self.source):
+                    self.state = State.SE
+                    break
 
                 c = self.source[self.input_position]
-                print(self.classify(c))
-                self.state = delta[self.state][self.classify(c)]
-                if c != '"': token_lexeme += c
-                self.advance()
+                char_class = self.classify(c)
+
+                if char_class not in delta[self.state]:
+                    self.state = State.SE
+                    break
+
+                next_state = delta[self.state][char_class]
+                if next_state == State.SE:
+                    self.state = State.SE
+                    break
+
+                print(self.state,self.classify(c))
+                self.state = next_state
+
+                token_lexeme += c
+                self.advance(c=char_class)
 
             self.rollback()
-            token_kind = TokenType[last_final]
-            token_column = self.column
-            token_line = self.line
+            token_kind = TokenType[self.last_final]
+            if token_kind is not None:
+                token_column = self.column
+                token_line = self.line
+                token_lexeme.strip('"')
 
-            if token_kind == TokenKind.IDENTIFIER: token_value = token_lexeme
-            elif token_kind == TokenKind.INT_LITERAL: token_value = int
-            elif token_kind == TokenKind.STRING_LITERAL: token_value = str
-            elif token_kind == TokenKind.KW_TRUE: token_value = True
-            elif token_kind == TokenKind.KW_FALSE: token_value = False
-            else: token_value = None
-            token = Token(token_kind,token_lexeme,token_value,token_line,token_column)
-            tokens += token
-
+                if token_kind == TokenKind.IDENTIFIER: token_value = token_lexeme
+                elif token_kind == TokenKind.INT_LITERAL: token_value = int(token_lexeme)
+                elif token_kind == TokenKind.STRING_LITERAL: token_value = str(token_lexeme.strip('"'))
+                elif token_kind == TokenKind.KW_TRUE: token_value = True
+                elif token_kind == TokenKind.KW_FALSE: token_value = False
+                else: token_value = None
+                token = Token(token_kind,token_lexeme,token_value,start_line,start_column)
+                tokens.append(token)
+        #TODO: 
+        # - Adicionar caso da string não fechada (LEXER_ERROR);
+        # - Adicionar tratamento para estado LEXER_ERROR; 
+        # - Barra invertida aleatória é erro léxico? 
+        if self.state == State.COMMENT_2_TYPE_STAR or  self.state == State.COMMENT_3_TYPE_STAR:
+            raise LexerError("Bloco de comentário não fechado", self.line,self.column)
+        tokens.append(Token(TokenKind.EOF,"",None,self.line,self.column))
         return tokens
         # yield  # mantém este método como gerador durante o desenvolvimento
 
