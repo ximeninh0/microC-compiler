@@ -124,13 +124,13 @@ def test_comentario_de_linha_pode_terminar_no_eof():
     ]
 
 
-# def test_strings_preservam_lexema_e_decodificam_escapes():
-#     tokens = Lexer(r'"" "a\n\t\"\\b" "// nao e comentario"').scan()
-#     assert [(token.lexeme, token.value) for token in tokens[:-1]] == [
-#         ('""', ""),
-#         (r'"a\n\t\"\\b"', "a\n\t\"\\b"),
-#         ('"// nao e comentario"', "// nao e comentario"),
-#     ]
+def test_strings_preservam_lexema_e_decodificam_escapes():
+    tokens = Lexer(r'"" "a\n\t\"\\b" "// nao e comentario"').scan()
+    assert [(token.lexeme, token.value) for token in tokens[:-1]] == [
+        ('""', ""),
+        (r'"a\n\t\"\\b"', "a\n\t\"\\b"),
+        ('"// nao e comentario"', "// nao e comentario"),
+    ]
 
 
 def test_strings_adjacentes_continuam_separadas():

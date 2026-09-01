@@ -3895,20 +3895,19 @@ class Lexer:
 
                 if token_kind == TokenKind.IDENTIFIER: token_value = token_lexeme
                 elif token_kind == TokenKind.INT_LITERAL: token_value = int(token_lexeme)
-                elif token_kind == TokenKind.STRING_LITERAL: token_value = str(token_lexeme.strip('"'))
+                elif token_kind == TokenKind.STRING_LITERAL: 
+                    raw_str = token_lexeme[1:-1]
+                    token_value = (raw_str.replace(r'\n', '\n').replace(r'\t', '\t').replace(r'\"', '"').replace(r'\\', '\\'))
                 elif token_kind == TokenKind.KW_TRUE: token_value = True
                 elif token_kind == TokenKind.KW_FALSE: token_value = False
                 else: token_value = None
                 token = Token(token_kind,token_lexeme,token_value,start_line,start_column)
                 tokens.append(token)
-        #TODO: 
-        # - Adicionar caso da string não fechada (LEXER_ERROR);
-        # - Adicionar tratamento para estado LEXER_ERROR; 
-        # - Barra invertida aleatória é erro léxico? 
-        if self.state == State.COMMENT_2_TYPE_STAR or self.state == State.COMMENT_3_TYPE_STAR:
-            raise LexerError("Bloco de comentário não fechado", self.line,self.column)
-        if self.state == State.IN_STRING or self.state == State.IN_STRING_ESCAPE:
-            raise LexerError("String Aberta", self.line,self.column)
+
+        # if self.state == State.COMMENT_2_TYPE_STAR or self.state == State.COMMENT_3_TYPE_STAR:
+        #     raise LexerError("Bloco de comentário não fechado", self.line,self.column)
+        # if self.state == State.IN_STRING or self.state == State.IN_STRING_ESCAPE:
+        #     raise LexerError("String Aberta", self.line,self.column)
         tokens.append(Token(TokenKind.EOF,"",None,self.line,self.column))
         return tokens
         # yield  # mantém este método como gerador durante o desenvolvimento
