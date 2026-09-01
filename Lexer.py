@@ -158,8 +158,8 @@ class State(enum.Enum):
     INT_2 = 67
     INT_3 = 68
 
-    ENTER_1 = 69
-    ENTER_2 = 70
+    # ENTER_1 = 69
+    # ENTER_2 = 70
 
     SE = 71
 
@@ -2174,8 +2174,51 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.COMMA: State.IN_STRING,
         CharClass.SCOLON: State.IN_STRING,
         CharClass.SPACE: State.IN_STRING,
+        CharClass.INV_SLASH: State.IN_STRING_ESCAPE,
+        CharClass.NEW_LINE : State.LEXER_ERROR
+    },
+
+    State.IN_STRING_ESCAPE: {
+        CharClass.LETTER_I: State.LEXER_ERROR,
+        CharClass.LETTER_E: State.LEXER_ERROR,
+        CharClass.LETTER_F: State.LEXER_ERROR,
+        CharClass.LETTER_W: State.LEXER_ERROR,
+        CharClass.LETTER_H: State.LEXER_ERROR,
+        CharClass.LETTER_L: State.LEXER_ERROR,
+        CharClass.LETTER_R: State.LEXER_ERROR,
+        CharClass.LETTER_T: State.IN_STRING,      
+        CharClass.LETTER_U: State.LEXER_ERROR,
+        CharClass.LETTER_N: State.IN_STRING,      
+        CharClass.LETTER_V: State.LEXER_ERROR,
+        CharClass.LETTER_O: State.LEXER_ERROR,
+        CharClass.LETTER_D: State.LEXER_ERROR,
+        CharClass.LETTER_A: State.LEXER_ERROR,
+        CharClass.LETTER_S: State.LEXER_ERROR,
+        CharClass.LETTER_B: State.LEXER_ERROR,
+        CharClass.LETTER_P: State.LEXER_ERROR,
+        CharClass.LETTER: State.LEXER_ERROR,
+        CharClass.DIGIT: State.LEXER_ERROR,
+        CharClass.QUOTE: State.IN_STRING,        
+        CharClass.EQUAL: State.LEXER_ERROR,
+        CharClass.NOT: State.LEXER_ERROR,
+        CharClass.LESS: State.LEXER_ERROR,
+        CharClass.GREATER: State.LEXER_ERROR,
+        CharClass.AMPERSAND: State.LEXER_ERROR,
+        CharClass.PIPE: State.LEXER_ERROR,
+        CharClass.PLUS: State.LEXER_ERROR,
+        CharClass.MINUS: State.LEXER_ERROR,
+        CharClass.STAR: State.LEXER_ERROR,
+        CharClass.SLASH: State.LEXER_ERROR,
+        CharClass.PERCENT: State.LEXER_ERROR,
+        CharClass.OPN_PAREN: State.LEXER_ERROR,
+        CharClass.CLS_PAREN: State.LEXER_ERROR,
+        CharClass.OPN_BRACE: State.LEXER_ERROR,
+        CharClass.CLS_BRACE: State.LEXER_ERROR,
+        CharClass.COMMA: State.LEXER_ERROR,
+        CharClass.SCOLON: State.LEXER_ERROR,
+        CharClass.SPACE: State.LEXER_ERROR,
         CharClass.INV_SLASH: State.IN_STRING,
-        CharClass.NEW_LINE : State.IN_STRING
+        CharClass.NEW_LINE : State.LEXER_ERROR
     },
 
     State.IN_STRING_END: {
@@ -3268,92 +3311,6 @@ delta: dict[State, dict[CharClass, State]] = {
         CharClass.NEW_LINE : State.SE  
     },
 
-    State.ENTER_1: {
-        CharClass.LETTER_I: State.SE,
-        CharClass.LETTER_E: State.SE,
-        CharClass.LETTER_F: State.SE,
-        CharClass.LETTER_W: State.SE,
-        CharClass.LETTER_H: State.SE,
-        CharClass.LETTER_L: State.SE,
-        CharClass.LETTER_R: State.SE,
-        CharClass.LETTER_T: State.SE,
-        CharClass.LETTER_U: State.SE,
-        CharClass.LETTER_N: State.ENTER_1,
-        CharClass.LETTER_V: State.SE,
-        CharClass.LETTER_O: State.SE,
-        CharClass.LETTER_D: State.SE,
-        CharClass.LETTER_A: State.SE,
-        CharClass.LETTER_S: State.SE,
-        CharClass.LETTER_B: State.SE,
-        CharClass.LETTER_P: State.SE,
-        CharClass.LETTER: State.SE,
-        CharClass.DIGIT: State.SE,
-        CharClass.QUOTE: State.SE,
-        CharClass.EQUAL: State.SE,
-        CharClass.NOT: State.SE,
-        CharClass.LESS: State.SE,
-        CharClass.GREATER: State.SE,
-        CharClass.AMPERSAND: State.SE,
-        CharClass.PIPE: State.SE,
-        CharClass.PLUS: State.SE,
-        CharClass.MINUS: State.SE,
-        CharClass.STAR: State.SE,
-        CharClass.SLASH: State.SE,
-        CharClass.PERCENT: State.SE,
-        CharClass.OPN_PAREN: State.SE,
-        CharClass.CLS_PAREN: State.SE,
-        CharClass.OPN_BRACE: State.SE,
-        CharClass.CLS_BRACE: State.SE,
-        CharClass.COMMA: State.SE,
-        CharClass.SCOLON: State.SE,
-        CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE,
-        CharClass.NEW_LINE : State.SE  
-    },
-
-    State.ENTER_2: {
-        CharClass.LETTER_I: State.SE,
-        CharClass.LETTER_E: State.SE,
-        CharClass.LETTER_F: State.SE,
-        CharClass.LETTER_W: State.SE,
-        CharClass.LETTER_H: State.SE,
-        CharClass.LETTER_L: State.SE,
-        CharClass.LETTER_R: State.SE,
-        CharClass.LETTER_T: State.SE,
-        CharClass.LETTER_U: State.SE,
-        CharClass.LETTER_N: State.SE,
-        CharClass.LETTER_V: State.SE,
-        CharClass.LETTER_O: State.SE,
-        CharClass.LETTER_D: State.SE,
-        CharClass.LETTER_A: State.SE,
-        CharClass.LETTER_S: State.SE,
-        CharClass.LETTER_B: State.SE,
-        CharClass.LETTER_P: State.SE,
-        CharClass.LETTER: State.SE,
-        CharClass.DIGIT: State.SE,
-        CharClass.QUOTE: State.SE,
-        CharClass.EQUAL: State.SE,
-        CharClass.NOT: State.SE,
-        CharClass.LESS: State.SE,
-        CharClass.GREATER: State.SE,
-        CharClass.AMPERSAND: State.SE,
-        CharClass.PIPE: State.SE,
-        CharClass.PLUS: State.SE,
-        CharClass.MINUS: State.SE,
-        CharClass.STAR: State.SE,
-        CharClass.SLASH: State.SE,
-        CharClass.PERCENT: State.SE,
-        CharClass.OPN_PAREN: State.SE,
-        CharClass.CLS_PAREN: State.SE,
-        CharClass.OPN_BRACE: State.SE,
-        CharClass.CLS_BRACE: State.SE,
-        CharClass.COMMA: State.SE,
-        CharClass.SCOLON: State.SE,
-        CharClass.SPACE: State.SE,      
-        CharClass.INV_SLASH: State.SE,
-        CharClass.NEW_LINE : State.SE  
-    },
-
     State.WS: {
         CharClass.LETTER_I: State.SE,
         CharClass.LETTER_E: State.SE,
@@ -3788,9 +3745,6 @@ TokenType = {
     State.COMMENT_4_TYPE_STAR : None,
     State.COMMENT_3_TYPE_SLASH : None,
     State.COMMENT_2_TYPE_SLASH : None
-
-    #State.ENTER_2 : TODO: o que colocar aqui ?
-
 }
 
 class Lexer:
@@ -3823,6 +3777,9 @@ class Lexer:
             self.input_position += 1
 
     def classify(self, char: str) -> CharClass | None:
+        if not char.isascii():
+            return None
+
         match char:
             case "=": return CharClass.EQUAL
             case "<": return CharClass.LESS
@@ -3877,6 +3834,9 @@ class Lexer:
             start_line = self.line
             start_column = self.column
 
+            self.last_final = None
+            self.last_final_position = self.input_position
+
             token_column = 0
             token_line = 0
             token_lexeme = ""
@@ -3884,13 +3844,18 @@ class Lexer:
             token_kind = None
 
             while self.state != State.SE:
-
+                
                 if self.state in final_states:
                     self.last_final = self.state
                     self.last_final_position = self.input_position
-                    print("LAST FINAL: ",self.last_final)
+                    # print("LAST FINAL: ",self.last_final)
 
                 if self.input_position >= len(self.source):
+                    if self.state == State.COMMENT_2_TYPE_STAR or self.state == State.COMMENT_3_TYPE_STAR:
+                        raise LexerError("Bloco de comentário não fechado", start_line, start_column)
+                    if self.state == State.IN_STRING or self.state == State.IN_STRING_ESCAPE:
+                        raise LexerError("String Aberta", start_line, start_column)
+                    
                     self.state = State.SE
                     break
 
@@ -3906,13 +3871,22 @@ class Lexer:
                     self.state = State.SE
                     break
 
-                print(self.state,self.classify(c))
-                self.state = next_state
+                if next_state == State.LEXER_ERROR:
+                    if self.state == State.IN_STRING_ESCAPE:
+                        raise LexerError("Escape Inválido!",self.line,self.column - 1)
+                    else:
+                        raise LexerError("Caractere Inválido!",self.line,self.column)
+                # print(self.state,self.classify(c))
 
+                self.state = next_state
                 token_lexeme += c
                 self.advance(c=char_class)
 
             self.rollback()
+
+            if self.last_final is None:
+                raise LexerError("Caractere inválido ou símbolo incompleto", start_line, start_column)
+
             token_kind = TokenType[self.last_final]
             if token_kind is not None:
                 token_column = self.column
@@ -3931,8 +3905,10 @@ class Lexer:
         # - Adicionar caso da string não fechada (LEXER_ERROR);
         # - Adicionar tratamento para estado LEXER_ERROR; 
         # - Barra invertida aleatória é erro léxico? 
-        if self.state == State.COMMENT_2_TYPE_STAR or  self.state == State.COMMENT_3_TYPE_STAR:
+        if self.state == State.COMMENT_2_TYPE_STAR or self.state == State.COMMENT_3_TYPE_STAR:
             raise LexerError("Bloco de comentário não fechado", self.line,self.column)
+        if self.state == State.IN_STRING or self.state == State.IN_STRING_ESCAPE:
+            raise LexerError("String Aberta", self.line,self.column)
         tokens.append(Token(TokenKind.EOF,"",None,self.line,self.column))
         return tokens
         # yield  # mantém este método como gerador durante o desenvolvimento
