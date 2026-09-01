@@ -3904,10 +3904,11 @@ class Lexer:
                 token = Token(token_kind,token_lexeme,token_value,start_line,start_column)
                 tokens.append(token)
 
-        # if self.state == State.COMMENT_2_TYPE_STAR or self.state == State.COMMENT_3_TYPE_STAR:
-        #     raise LexerError("Bloco de comentário não fechado", self.line,self.column)
-        # if self.state == State.IN_STRING or self.state == State.IN_STRING_ESCAPE:
-        #     raise LexerError("String Aberta", self.line,self.column)
+        #TODO: Check the need of this last verifications:
+        if self.state == State.COMMENT_2_TYPE_STAR or self.state == State.COMMENT_3_TYPE_STAR:
+            raise LexerError("Bloco de comentário não fechado", self.line,self.column)
+        if self.state == State.IN_STRING or self.state == State.IN_STRING_ESCAPE:
+            raise LexerError("String Aberta", self.line,self.column)
         tokens.append(Token(TokenKind.EOF,"",None,self.line,self.column))
         return tokens
         # yield  # mantém este método como gerador durante o desenvolvimento
