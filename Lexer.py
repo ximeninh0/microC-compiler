@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-import enum
 from dataclasses import dataclass
+import enum
 from typing import Iterator
 
+import helper
+from state_table import state_table
 
 class TokenKind(enum.Enum):
     """Classe já implementada: nomes e números não devem ser alterados."""
@@ -63,7 +65,6 @@ class Token:
             f"{self.value!r}, {self.line}, {self.column}>"
         )
 
-
 class LexerError(Exception):
     def __init__(self, message: str, line: int, column: int):
         super().__init__(message)
@@ -74,315 +75,212 @@ class LexerError(Exception):
     def __str__(self) -> str:
         return f"erro léxico em {self.line}:{self.column}: {self.message}"
 
-
-class State(enum.Enum):
-    START = 0
-    IN_IDENTIFIER = 1
-    IN_INT = 2
-    IN_STRING = 3
-    IN_STRING_ESCAPE = 4
-    IN_STRING_END = 5
-    
-    IN_ASSIGN = 6          # =
-    IN_EQUAL_EQUAL = 7     # ==
-    IN_EXCLAMATION = 8     # !
-    IN_NOT_EQUAL = 9       # !=
-    IN_LESS = 10           # <
-    IN_LESS_EQUAL = 11     # <=
-    IN_GREATER = 12        # >
-    IN_GREATER_EQUAL = 13  # >=
-    IN_AMPERSAND = 14      # &
-    IN_LOGICAL_AND = 15    # &&
-    IN_PIPE = 16           # |
-    IN_LOGICAL_OR = 17     # ||
-    
-    IN_PLUS = 18
-    IN_MINUS = 19
-    IN_STAR = 20
-    IN_PERCENT = 21
-    IN_LEFT_PAREN = 22
-    IN_RIGHT_PAREN = 23
-    IN_LEFT_BRACE = 24
-    IN_RIGHT_BRACE = 25
-    IN_COMMA = 26
-    IN_SEMICOLON = 27
-
-    ERROR = -1
-    
-
-
-class CharClass(enum.Enum):
-    LETTER = 0
-    DIGIT = 1
-    EQUAL = 2
-    LESS = 3
-    GREATER = 4
-    NOT = 5
-    SPACE = 6
-    PLUS = 7
-    MINUS = 8
-    STAR = 9
-    SLASH = 10
-    QUOTE = 11
-    OPEN_PAREN = 12
-    OPEN_BRACE = 13
-    CLOSE_PAREN = 14
-    CLOSE_BRACE = 15
-    INV_SLASH = 16
-    AMPERSAND = 17
-    PIPE = 18
-    PERCENT = 19
-
-CHAR_CLASS = {
-    "=": CharClass.EQUAL,
-    "<": CharClass.LESS,
-    ">": CharClass.GREATER,
-    "!": CharClass.NOT,
-    "+": CharClass.PLUS,
-    "-": CharClass.MINUS,
-    "*": CharClass.STAR,
-    "/": CharClass.SLASH,
-    "%": CharClass.PERCENT,
-    '"': CharClass.QUOTE,
-    "(": CharClass.OPEN_PAREN,
-    "{": CharClass.OPEN_BRACE,
-    ")": CharClass.CLOSE_PAREN,
-    "}": CharClass.CLOSE_BRACE,
-    " ": CharClass.SPACE,
-    "\\":CharClass.INV_SLASH,
-    "&": CharClass.AMPERSAND,
-    "|": CharClass.PIPE,
-    ",": CharClass.COMMA,
-    ";": CharClass.SEMICOLON
-}
-
-KEYWORDS: dict[str, TokenKind] = {
-    "int": TokenKind.KW_INT,
-    "bool": TokenKind.KW_BOOL,
-    "void": TokenKind.KW_VOID,
-    "true": TokenKind.KW_TRUE,
-    "false": TokenKind.KW_FALSE,
-    "if": TokenKind.KW_IF,
-    "else": TokenKind.KW_ELSE,
-    "while": TokenKind.KW_WHILE,
-    "return": TokenKind.KW_RETURN,
-    "print": TokenKind.KW_PRINT
-}
-
 class Lexer:
     """Converte texto-fonte MicroC em uma sequência de tokens."""
     state = None
+    input_position = 0
     last_final = None
-    position = 0
+    last_final_position = 0
+    source = None
+    line = 1
+    column = 1
 
-    delta: dict[State, dict[CharClass, State]] = {
-        State.START: {
-            CharClass.LETTER: State.IN_IDENTIFIER,
-            CharClass.DIGIT: State.IN_INT,
-            CharClass.QUOTE: State.IN_STRING,
-            CharClass.EQUAL: State.IN_ASSIGN,
-            CharClass.NOT: State.IN_EXCLAMATION,
-            CharClass.LESS: State.IN_LESS,
-            CharClass.GREATER: State.IN_GREATER,
-            CharClass.AMPERSAND: State.IN_AMPERSAND,
-            CharClass.PIPE: State.IN_PIPE,
-            CharClass.PLUS: State.IN_PLUS,
-            CharClass.MINUS: State.IN_MINUS,
-            CharClass.STAR: State.IN_STAR,
-            CharClass.PERCENT: State.IN_PERCENT,
-            CharClass.OPEN_PAREN: State.IN_LEFT_PAREN,
-            CharClass.CLOSE_PAREN: State.IN_RIGHT_PAREN,
-            CharClass.OPEN_BRACE: State.IN_LEFT_BRACE,
-            CharClass.CLOSE_BRACE: State.IN_RIGHT_BRACE,
-            CharClass.COMMA: State.IN_COMMA,
-            CharClass.SEMICOLON: State.IN_SEMICOLON
-        },
+    returnToken = {
+        helper.State.IN_IDENTIFIER : TokenKind.IDENTIFIER,
 
-        # Identificadores e Inteiros (loops de continuação)
-        State.IN_IDENTIFIER: {
-            CharClass.LETTER: State.IN_IDENTIFIER,
-            CharClass.DIGIT: State.IN_IDENTIFIER
-        },
-        State.IN_INT: {
-            CharClass.DIGIT: State.IN_INT
-        },
+        helper.State.IN_INT : TokenKind.INT_LITERAL,
+        helper.State.IN_STRING_END : TokenKind.STRING_LITERAL,
 
-        # Strings e Escapes
-        State.IN_STRING: {
-            CharClass.LETTER: State.IN_STRING,
-            CharClass.DIGIT: State.IN_STRING,
-            CharClass.EQUAL: State.IN_STRING,
-            CharClass.LESS: State.IN_STRING,
-            CharClass.GREATER: State.IN_STRING,
-            CharClass.NOT: State.IN_STRING,
-            CharClass.SPACE: State.IN_STRING,
-            CharClass.PLUS: State.IN_STRING,
-            CharClass.MINUS: State.IN_STRING,
-            CharClass.STAR: State.IN_STRING,
-            CharClass.SLASH: State.IN_STRING,
-            CharClass.PERCENT: State.IN_STRING,
-            CharClass.OPEN_PAREN: State.IN_STRING,
-            CharClass.CLOSE_PAREN: State.IN_STRING,
-            CharClass.OPEN_BRACE: State.IN_STRING,
-            CharClass.CLOSE_BRACE: State.IN_STRING,
-            CharClass.AMPERSAND: State.IN_STRING,
-            CharClass.PIPE: State.IN_STRING,
-            CharClass.COMMA: State.IN_STRING,
-            CharClass.SEMICOLON: State.IN_STRING,
-            CharClass.INV_SLASH: State.IN_STRING_ESCAPE,  # Transita ao ler \
-            CharClass.QUOTE: State.IN_STRING_END        # Transita ao ler o " final
-        },
-        State.IN_STRING_ESCAPE: {
-            # Qualquer caractere de escape válido devolve o estado para IN_STRING
-            CharClass.LETTER: State.IN_STRING,
-            CharClass.INV_SLASH: State.IN_STRING,
-            CharClass.QUOTE: State.IN_STRING
-        },
+        helper.State.IN_ASSIGN : TokenKind.ASSIGN,
+        helper.State.IN_EQUAL_EQUAL : TokenKind.EQUAL_EQUAL,
+        helper.State.IN_EXCLAMATION : TokenKind.LOGICAL_NOT,
+        helper.State.IN_NOT_EQUAL : TokenKind.NOT_EQUAL,
+        helper.State.IN_LESS : TokenKind.LESS,
+        helper.State.IN_LESS_EQUAL : TokenKind.LESS_EQUAL,
+        helper.State.IN_GREATER : TokenKind.GREATER,
+        helper.State.IN_GREATER_EQUAL : TokenKind.GREATER_EQUAL,
+        helper.State.IN_LOGICAL_AND : TokenKind.LOGICAL_AND,
+        helper.State.IN_LOGICAL_OR : TokenKind.LOGICAL_OR,     
+        helper.State.IN_PLUS : TokenKind.PLUS,
+        helper.State.IN_MINUS : TokenKind.MINUS,
+        helper.State.IN_STAR : TokenKind.STAR,
+        helper.State.IN_SLASH : TokenKind.SLASH,
+        helper.State.IN_PERCENT : TokenKind.PERCENT,
+        helper.State.IN_OPN_PAREN : TokenKind.LEFT_PAREN,
+        helper.State.IN_CLS_PAREN : TokenKind.RIGHT_PAREN,
+        helper.State.IN_OPN_BRACE : TokenKind.LEFT_BRACE,
+        helper.State.IN_CLS_BRACE : TokenKind.RIGHT_BRACE,
+        helper.State.IN_COMMA : TokenKind.COMMA,
+        helper.State.IN_SCOLON : TokenKind.SEMICOLON,
 
-        # Operadores simples que viram compostos se encontrarem o segundo caractere
-        State.IN_ASSIGN: {
-            CharClass.EQUAL: State.IN_EQUAL_EQUAL       # = seguido de = vira ==
-        },
-        State.IN_EXCLAMATION: {
-            CharClass.EQUAL: State.IN_NOT_EQUAL         # ! seguido de = vira !=
-        },
-        State.IN_LESS: {
-            CharClass.EQUAL: State.IN_LESS_EQUAL        # < seguido de = vira <=
-        },
-        State.IN_GREATER: {
-            CharClass.EQUAL: State.IN_GREATER_EQUAL     # > seguido de = vira >=
-        },
-        State.IN_AMPERSAND: {
-            CharClass.AMPERSAND: State.IN_LOGICAL_AND   # & seguido de & vira &&
-        },
-        State.IN_PIPE: {
-            CharClass.PIPE: State.IN_LOGICAL_OR         # | seguido de | vira ||
-        },
+        helper.State.ELSE_1 : TokenKind.IDENTIFIER,
+        helper.State.ELSE_2 : TokenKind.IDENTIFIER,
+        helper.State.ELSE_3 : TokenKind.IDENTIFIER,
+        helper.State.ELSE_4 : TokenKind.KW_ELSE,
+
+        helper.State.RETURN_1 : TokenKind.IDENTIFIER,
+        helper.State.RETURN_2 : TokenKind.IDENTIFIER,
+        helper.State.RETURN_3 : TokenKind.IDENTIFIER,
+        helper.State.RETURN_4 : TokenKind.IDENTIFIER,
+        helper.State.RETURN_5 : TokenKind.IDENTIFIER,
+        helper.State.RETURN_6 : TokenKind.KW_RETURN,
+
+
+        helper.State.WHILE_1 : TokenKind.IDENTIFIER,
+        helper.State.WHILE_2 : TokenKind.IDENTIFIER,
+        helper.State.WHILE_3 : TokenKind.IDENTIFIER,
+        helper.State.WHILE_4 : TokenKind.IDENTIFIER,
+        helper.State.WHILE_5 : TokenKind.KW_WHILE,
+
+        helper.State.PRINT_1 : TokenKind.IDENTIFIER,
+        helper.State.PRINT_2 : TokenKind.IDENTIFIER,
+        helper.State.PRINT_3 : TokenKind.IDENTIFIER,
+        helper.State.PRINT_4 : TokenKind.IDENTIFIER,
+        helper.State.PRINT_5 : TokenKind.KW_PRINT,
+
+        helper.State.FALSE_1 : TokenKind.IDENTIFIER,
+        helper.State.FALSE_2 : TokenKind.IDENTIFIER,
+        helper.State.FALSE_3 : TokenKind.IDENTIFIER,
+        helper.State.FALSE_4 : TokenKind.IDENTIFIER,
+        helper.State.FALSE_5 : TokenKind.KW_FALSE,
+
+        helper.State.TRUE_1 : TokenKind.IDENTIFIER,
+        helper.State.TRUE_2 : TokenKind.IDENTIFIER,
+        helper.State.TRUE_3 : TokenKind.IDENTIFIER,
+        helper.State.TRUE_4 : TokenKind.KW_TRUE,
+
+        helper.State.VOID_1 : TokenKind.IDENTIFIER,
+        helper.State.VOID_2 : TokenKind.IDENTIFIER,
+        helper.State.VOID_3 : TokenKind.IDENTIFIER,
+        helper.State.VOID_4 : TokenKind.KW_VOID,
+
+        helper.State.BOOL_1 : TokenKind.IDENTIFIER,
+        helper.State.BOOL_2 : TokenKind.IDENTIFIER,
+        helper.State.BOOL_3 : TokenKind.IDENTIFIER,
+        helper.State.BOOL_4 : TokenKind.KW_BOOL,
+
+        helper.State.IN_I : TokenKind.IDENTIFIER,
+        helper.State.IF_2 : TokenKind.KW_IF,
+
+        helper.State.INT_1 : TokenKind.IDENTIFIER,
+        helper.State.INT_2 : TokenKind.IDENTIFIER,
+        helper.State.INT_3 : TokenKind.KW_INT,
+
+        helper.State.WS : None,
+
+        helper.State.COMMENT_4_TYPE_STAR : None,
+        helper.State.COMMENT_3_TYPE_SLASH : None,
+        helper.State.COMMENT_2_TYPE_SLASH : None
     }
 
-    final_states = {
-        State.IN_IDENTIFIER, State.IN_INT, State.IN_STRING_END,
-        State.IN_ASSIGN, State.IN_EQUAL_EQUAL, State.IN_EXCLAMATION,
-        State.IN_NOT_EQUAL, State.IN_LESS, State.IN_LESS_EQUAL,
-        State.IN_GREATER, State.IN_GREATER_EQUAL, State.IN_LOGICAL_AND,
-        State.IN_LOGICAL_OR, State.IN_PLUS, State.IN_MINUS, State.IN_STAR,
-        State.IN_PERCENT, State.IN_LEFT_PAREN, State.IN_RIGHT_PAREN,
-        State.IN_LEFT_BRACE, State.IN_RIGHT_BRACE, State.IN_COMMA,
-        State.IN_SEMICOLON
-    }
-
-    def get_next_state(self, current_state: State, char_class: CharClass) -> State:
-        return self.delta.get(current_state, {}).get(char_class, State.ERROR)
-    
+    def rollback(self):
+        self.state = helper.State.START
+        self.input_position = self.last_final_position
+        
     def __init__(self, source: str):
         self.source = source
-        self.position = 0
-        self.line = 1
-        self.column = 1
+        self.state = helper.State.START
+        self.last_final_position = self.input_position
 
-    def classify(self, char: str) -> CharClass | None:
-        if char.isalpha() or char == '_': return CharClass.LETTER
-        if char.isdigit(): return CharClass.DIGIT
-        return CHAR_CLASS.get(char, None)
-
-    def get_next_state(self, current_state: State, char_class: CharClass | None) -> State:
-        if char_class is None: return State.ERROR
-        return self.delta.get(current_state, {}).get(char_class, State.ERROR)
-
-    def advance(self) -> None:
-        if self.position < len(self.source):
-            if self.source[self.position] == "\n":
+    def advance(self, c) -> None:
+        if self.input_position < len(self.source):
+            if c == helper.CharClass.NEW_LINE:
                 self.line += 1
                 self.column = 1
             else:
                 self.column += 1
-            self.position += 1
+            self.input_position += 1
 
-    def rollback_to(self, target_position: int, target_line: int, target_column: int) -> None:
-        self.position = target_position
-        self.line = target_line
-        self.column = target_column
+    def classify(self, char: str) -> helper.CharClass | None:
+        if not char.isascii():
+            return None
 
-    def skip_whitespace_and_comments(self) -> bool:
-        skipped = False
-        while self.position < len(self.source):
-            ch = self.source[self.position]
+        if (helper.CHAR_CLASS_MAP.get(char) is not None):
+            return helper.CHAR_CLASS_MAP.get(char)
 
-            if ch in (" ", "\t", "\r", "\n"):
-                self.advance()
-                skipped = True
-                continue
+        if char.isalpha() or char == '_': return helper.CharClass.LETTER
+        if char.isdigit(): return helper.CharClass.DIGIT
 
-            if ch == "/" and self.position + 1 < len(self.source) and self.source[self.position + 1] == "/":
-                while self.position < len(self.source) and self.source[self.position] != "\n":
-                    self.advance()
-                skipped = True
-                continue
+        raise LexerError(f"Caractere inválido: {char}", self.line, self.column)
 
-            if ch == "/" and self.position + 1 < len(self.source) and self.source[self.position + 1] == "*":
-                self.advance()
-                self.advance()
-                closed = False
-                while self.position < len(self.source):
-                    if (
-                        self.source[self.position] == "*"
-                        and self.position + 1 < len(self.source)
-                        and self.source[self.position + 1] == "/"
-                    ):
-                        self.advance()
-                        self.advance()
-                        closed = True
-                        break
-                    self.advance()
-                if not closed:
-                    raise LexerError("Comment not terminated", self.line, self.column)
-                skipped = True
-                continue
-
-            break
-        return skipped
 
     def tokens(self) -> Iterator[Token]:
         """Produza todos os tokens significativos e um único EOF ao final."""
-        while self.position < len(self.source):
-            if self.skip_whitespace_and_comments(): continue
-            if self.position >= len(self.source): break
-
-            start_position = self.position
+        tokens = []
+        while self.input_position < len(self.source):
             start_line = self.line
             start_column = self.column
-            state = State.START
-            last_final = None
 
-            while self.position < len(self.source):
-                char = self.source[self.position]
-                char_class = self.classify(char)
-                next_state = self.get_next_state(state, char_class)
+            self.last_final = None
+            self.last_final_position = self.input_position
 
-                if next_state == State.ERROR:
+            token_lexeme = ""
+            token_value = None
+            token_kind = None
+
+            while self.state != helper.State.SE:
+                
+                if self.state in helper.final_states:
+                    self.last_final = self.state
+                    self.last_final_position = self.input_position
+
+                if self.input_position >= len(self.source):
+                    if self.state == helper.State.COMMENT_2_TYPE_STAR or self.state == helper.State.COMMENT_3_TYPE_STAR:
+                        raise LexerError("Bloco de comentário não fechado", start_line, start_column)
+                    if self.state == helper.State.IN_STRING or self.state == helper.State.IN_STRING_ESCAPE:
+                        raise LexerError("String Aberta", start_line, start_column)
+                    
+                    self.state = helper.State.SE
                     break
 
+                c = self.source[self.input_position]
+                char_class = self.classify(c)
+
+                if char_class not in state_table[self.state]:
+                    self.state = helper.State.SE
+                    break
+
+                next_state = state_table[self.state][char_class]
+                if next_state == helper.State.SE:
+                    self.state = helper.State.SE
+                    break
+
+                if next_state == helper.State.LEXER_ERROR:
+                    if self.state == helper.State.IN_STRING_ESCAPE:
+                        raise LexerError("Escape Inválido!", self.line, self.column - 1)
+                    else:
+                        raise LexerError("Caractere Inválido!", self.line, self.column)
+
                 self.state = next_state
-                self.advance()
+                token_lexeme += c
+                self.advance(c=char_class)
 
-                if self.state in self.final_states:
-                    last_final = (state, self.position, self.line, self.column)
+            self.rollback()
 
-            if last_final is not None:
-                final_state, end_position, end_line, end_column = last_final
-                self.rollback_to(end_position, end_line, end_column)
-                lexeme = self.source[start_position:end_position]
+            if self.last_final is None:
+                raise LexerError("Caractere inválido ou símbolo incompleto", start_line, start_column)
 
-                '''TODO PRECISA RETORNAR O TOKEN CORRETO COM BASE NO final_state E lexeme
-                    algo como Token(estado, lexeme, value, line, column)
-                    provavel que a gente precise criar um metodo pra determinar o token
-                    com base no estado final, no lexeme e no value
-                ''' 
-                
-            else:
-                raise LexerError(f"caractere inesperado: {self.source[self.position]!r}", self.line, self.column)
-            
-        yield Token(TokenKind.EOF, "", None, self.line, self.column) # mantém este método como gerador durante o desenvolvimento
+            token_kind = self.returnToken[self.last_final]
+            if token_kind is not None:
+                if token_kind == TokenKind.IDENTIFIER: token_value = token_lexeme
+                elif token_kind == TokenKind.INT_LITERAL: token_value = int(token_lexeme)
+                elif token_kind == TokenKind.STRING_LITERAL: 
+                    raw_str = token_lexeme[1:-1]
+                    token_value = (raw_str.replace(r'\n', '\n').replace(r'\t', '\t').replace(r'\"', '"').replace(r'\\', '\\'))
+                elif token_kind == TokenKind.KW_TRUE: token_value = True
+                elif token_kind == TokenKind.KW_FALSE: token_value = False
+                else: token_value = None
+                token = Token(token_kind,token_lexeme,token_value,start_line,start_column)
+                tokens.append(token)
+
+        #TODO: Check the need of this last verifications:
+        if self.state == helper.State.COMMENT_2_TYPE_STAR or self.state == helper.State.COMMENT_3_TYPE_STAR:
+            raise LexerError("Bloco de comentário não fechado", self.line,self.column)
+        if self.state == helper.State.IN_STRING or self.state == helper.State.IN_STRING_ESCAPE:
+            raise LexerError("String Aberta", self.line,self.column)
+        tokens.append(Token(TokenKind.EOF,"",None,self.line,self.column))
+        return tokens
+        # yield  # mantém este método como gerador durante o desenvolvimento
 
     def scan(self) -> list[Token]:
         return list(self.tokens())
